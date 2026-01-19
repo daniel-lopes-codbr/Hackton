@@ -1,0 +1,120 @@
+using AgroSolutions.Api.Models;
+using AgroSolutions.Api.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace AgroSolutions.Api.Controllers;
+
+/// <summary>
+/// High-performance ingestion controller for sensor data
+/// </summary>
+[ApiController]
+[Route("api/[controller]")]
+[Produces("application/json")]
+public class IngestionController : ControllerBase
+{
+    private readonly IIngestionService _ingestionService;
+    private readonly ILogger<IngestionController> _logger;
+
+    public IngestionController(IIngestionService ingestionService, ILogger<IngestionController> logger)
+    {
+        _ingestionService = ingestionService;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// Ingests a single sensor reading
+    /// </summary>
+    /// <param name="dto">Sensor reading data</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Created sensor reading</returns>
+    [HttpPost("single")]
+    [ProducesResponseType(typeof(SensorReadingDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> IngestSingle(
+        [FromBody] SensorReadingDto dto,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var reading = await _ingestionService.IngestSingleAsync(dto, cancellationToken);
+            
+            var responseDto = new SensorReadingDto
+            {
+                FieldId = reading.FieldId,
+                SensorType = reading.SensorType,
+                Value = reading.Value,
+                Unit = reading.Unit,
+                ReadingTimestamp = reading.ReadingTimestamp,
+                Location = reading.Location,
+                Metadata = reading.Metadata
+            };
+
+            return CreatedAtAction(nameof(IngestSingle), new { id = reading.Id }, responseDto);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error ingesting single reading");
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Ingests multiple sensor readings in batch (sequential processing)
+    /// </summary>
+    /// <param name="batchDto">Batch of sensor readings</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Ingestion response with processing statistics</returns>
+    [HttpPost("batch")]
+    [ProducesResponseType(typeof(IngestionResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> IngestBatch(
+        [FromBody] BatchSensorReadingDto batchDto,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _ingestionService.IngestBatchAsync(batchDto, cancellationToken);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error ingesting batch");
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Ingests multiple sensor readings in parallel for maximum performance
+    /// </summary>
+    /// <param name="batchDto">Batch of sensor readings</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Ingestion response with processing statistics</returns>
+    [HttpPost("batch/parallel")]
+    [ProducesResponseType(typeof(IngestionResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> IngestBatchParallel(
+        [FromBody] BatchSensorReadingDto batchDto,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _ingestionService.IngestBatchParallelAsync(batchDto, cancellationToken);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error ingesting parallel batch");
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Health check endpoint for ingestion service
+    /// </summary>
+    [HttpGet("health")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult Health()
+    {
+        return Ok(new { status = "healthy", service = "ingestion", timestamp = DateTime.UtcNow });
+    }
+}

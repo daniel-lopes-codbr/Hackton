@@ -5510,8 +5510,8 @@
     },
     "AgroSolutions.Domain/1.0.0": {
       "type": "project",
-      "path": "../AgroSolutions.Domain/AgroSolutions.Domain.csproj",
-      "msbuildProject": "../AgroSolutions.Domain/AgroSolutions.Domain.csproj"
+      "path": "../../src/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
+      "msbuildProject": "../../src/AgroSolutions.Domain/AgroSolutions.Domain.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -5529,11 +5529,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain.Tests/AgroSolutions.Domain.Tests.csproj",
+      "projectUniqueName": "/Volumes/External/FIAP/Hackton/tests/AgroSolutions.Domain.Tests/AgroSolutions.Domain.Tests.csproj",
       "projectName": "AgroSolutions.Domain.Tests",
-      "projectPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain.Tests/AgroSolutions.Domain.Tests.csproj",
+      "projectPath": "/Volumes/External/FIAP/Hackton/tests/AgroSolutions.Domain.Tests/AgroSolutions.Domain.Tests.csproj",
       "packagesPath": "/Users/lopes/.nuget/packages/",
-      "outputPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain.Tests/obj/",
+      "outputPath": "/Volumes/External/FIAP/Hackton/tests/AgroSolutions.Domain.Tests/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/lopes/.nuget/NuGet/NuGet.Config"
@@ -5548,8 +5548,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
-              "projectPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj"
+            "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
+              "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj"
             }
           }
         }

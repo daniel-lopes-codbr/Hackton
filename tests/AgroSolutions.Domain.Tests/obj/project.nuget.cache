@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "63G2eeHxY4g=",
+  "dgSpecHash": "UbSGhcrP/tY=",
   "success": true,
-  "projectFilePath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain.Tests/AgroSolutions.Domain.Tests.csproj",
+  "projectFilePath": "/Volumes/External/FIAP/Hackton/tests/AgroSolutions.Domain.Tests/AgroSolutions.Domain.Tests.csproj",
   "expectedPackageFiles": [
     "/Users/lopes/.nuget/packages/coverlet.collector/6.0.0/coverlet.collector.6.0.0.nupkg.sha512",
     "/Users/lopes/.nuget/packages/microsoft.codecoverage/17.8.0/microsoft.codecoverage.17.8.0.nupkg.sha512",

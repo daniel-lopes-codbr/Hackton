@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Volumes/External/FIAP/Hackton/AgroSolutions.Api.Tests/AgroSolutions.Api.Tests.csproj": {}
+    "/Volumes/External/FIAP/Hackton/tests/AgroSolutions.Api.Tests/AgroSolutions.Api.Tests.csproj": {}
   },
   "projects": {
-    "/Volumes/External/FIAP/Hackton/AgroSolutions.Api.Tests/AgroSolutions.Api.Tests.csproj": {
+    "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/AgroSolutions.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Volumes/External/FIAP/Hackton/AgroSolutions.Api.Tests/AgroSolutions.Api.Tests.csproj",
-        "projectName": "AgroSolutions.Api.Tests",
-        "projectPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Api.Tests/AgroSolutions.Api.Tests.csproj",
+        "projectUniqueName": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/AgroSolutions.Api.csproj",
+        "projectName": "AgroSolutions.Api",
+        "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/AgroSolutions.Api.csproj",
         "packagesPath": "/Users/lopes/.nuget/packages/",
-        "outputPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Api.Tests/obj/",
+        "outputPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/lopes/.nuget/NuGet/NuGet.Config"
@@ -26,11 +26,180 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/Volumes/External/FIAP/Hackton/AgroSolutions.Api/AgroSolutions.Api.csproj": {
-                "projectPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Api/AgroSolutions.Api.csproj"
+              "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
+                "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "AspNetCore.HealthChecks.UI": {
+              "target": "Package",
+              "version": "[8.0.1, )"
+            },
+            "AspNetCore.HealthChecks.UI.Client": {
+              "target": "Package",
+              "version": "[8.0.1, )"
+            },
+            "AspNetCore.HealthChecks.UI.InMemory.Storage": {
+              "target": "Package",
+              "version": "[8.0.1, )"
+            },
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
+            "Microsoft.Extensions.Diagnostics.HealthChecks": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Serilog.AspNetCore": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Serilog.Enrichers.Environment": {
+              "target": "Package",
+              "version": "[3.0.1, )"
+            },
+            "Serilog.Enrichers.Thread": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
+            "Serilog.Sinks.Console": {
+              "target": "Package",
+              "version": "[5.0.1, )"
+            },
+            "Serilog.Sinks.File": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.6.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.404/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
+        "projectName": "AgroSolutions.Domain",
+        "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
+        "packagesPath": "/Users/lopes/.nuget/packages/",
+        "outputPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/lopes/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.404/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Volumes/External/FIAP/Hackton/tests/AgroSolutions.Api.Tests/AgroSolutions.Api.Tests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Volumes/External/FIAP/Hackton/tests/AgroSolutions.Api.Tests/AgroSolutions.Api.Tests.csproj",
+        "projectName": "AgroSolutions.Api.Tests",
+        "projectPath": "/Volumes/External/FIAP/Hackton/tests/AgroSolutions.Api.Tests/AgroSolutions.Api.Tests.csproj",
+        "packagesPath": "/Users/lopes/.nuget/packages/",
+        "outputPath": "/Volumes/External/FIAP/Hackton/tests/AgroSolutions.Api.Tests/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/lopes/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/AgroSolutions.Api.csproj": {
+                "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/AgroSolutions.Api.csproj"
               },
-              "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
-                "projectPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj"
+              "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
+                "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj"
               }
             }
           }
@@ -79,139 +248,6 @@
               "version": "[2.5.3, )"
             }
           },
-          "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48",
-            "net481"
-          ],
-          "assetTargetFallback": true,
-          "warn": true,
-          "frameworkReferences": {
-            "Microsoft.NETCore.App": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.404/PortableRuntimeIdentifierGraph.json"
-        }
-      }
-    },
-    "/Volumes/External/FIAP/Hackton/AgroSolutions.Api/AgroSolutions.Api.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "/Volumes/External/FIAP/Hackton/AgroSolutions.Api/AgroSolutions.Api.csproj",
-        "projectName": "AgroSolutions.Api",
-        "projectPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Api/AgroSolutions.Api.csproj",
-        "packagesPath": "/Users/lopes/.nuget/packages/",
-        "outputPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Api/obj/",
-        "projectStyle": "PackageReference",
-        "configFilePaths": [
-          "/Users/lopes/.nuget/NuGet/NuGet.Config"
-        ],
-        "originalTargetFrameworks": [
-          "net8.0"
-        ],
-        "sources": {
-          "https://api.nuget.org/v3/index.json": {}
-        },
-        "frameworks": {
-          "net8.0": {
-            "targetAlias": "net8.0",
-            "projectReferences": {
-              "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
-                "projectPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj"
-              }
-            }
-          }
-        },
-        "warningProperties": {
-          "warnAsError": [
-            "NU1605"
-          ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
-        }
-      },
-      "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
-          "dependencies": {
-            "Microsoft.AspNetCore.OpenApi": {
-              "target": "Package",
-              "version": "[8.0.11, )"
-            },
-            "Swashbuckle.AspNetCore": {
-              "target": "Package",
-              "version": "[6.6.2, )"
-            }
-          },
-          "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48",
-            "net481"
-          ],
-          "assetTargetFallback": true,
-          "warn": true,
-          "frameworkReferences": {
-            "Microsoft.AspNetCore.App": {
-              "privateAssets": "none"
-            },
-            "Microsoft.NETCore.App": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.404/PortableRuntimeIdentifierGraph.json"
-        }
-      }
-    },
-    "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
-        "projectName": "AgroSolutions.Domain",
-        "projectPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
-        "packagesPath": "/Users/lopes/.nuget/packages/",
-        "outputPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/obj/",
-        "projectStyle": "PackageReference",
-        "configFilePaths": [
-          "/Users/lopes/.nuget/NuGet/NuGet.Config"
-        ],
-        "originalTargetFrameworks": [
-          "net8.0"
-        ],
-        "sources": {
-          "https://api.nuget.org/v3/index.json": {}
-        },
-        "frameworks": {
-          "net8.0": {
-            "targetAlias": "net8.0",
-            "projectReferences": {}
-          }
-        },
-        "warningProperties": {
-          "warnAsError": [
-            "NU1605"
-          ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
-        }
-      },
-      "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
           "imports": [
             "net461",
             "net462",

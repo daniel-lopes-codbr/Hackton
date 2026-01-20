@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {}
+    "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {}
   },
   "projects": {
-    "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
+    "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
+        "projectUniqueName": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
         "projectName": "AgroSolutions.Domain",
-        "projectPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
+        "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
         "packagesPath": "/Users/lopes/.nuget/packages/",
-        "outputPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/obj/",
+        "outputPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/lopes/.nuget/NuGet/NuGet.Config"

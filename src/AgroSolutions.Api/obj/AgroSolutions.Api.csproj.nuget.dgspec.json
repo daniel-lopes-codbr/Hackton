@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Volumes/External/FIAP/Hackton/AgroSolutions.Api/AgroSolutions.Api.csproj": {}
+    "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/AgroSolutions.Api.csproj": {}
   },
   "projects": {
-    "/Volumes/External/FIAP/Hackton/AgroSolutions.Api/AgroSolutions.Api.csproj": {
+    "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/AgroSolutions.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Volumes/External/FIAP/Hackton/AgroSolutions.Api/AgroSolutions.Api.csproj",
+        "projectUniqueName": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/AgroSolutions.Api.csproj",
         "projectName": "AgroSolutions.Api",
-        "projectPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Api/AgroSolutions.Api.csproj",
+        "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/AgroSolutions.Api.csproj",
         "packagesPath": "/Users/lopes/.nuget/packages/",
-        "outputPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Api/obj/",
+        "outputPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/lopes/.nuget/NuGet/NuGet.Config"
@@ -26,8 +26,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
-                "projectPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj"
+              "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
+                "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj"
               }
             }
           }
@@ -47,9 +47,45 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "AspNetCore.HealthChecks.UI": {
+              "target": "Package",
+              "version": "[8.0.1, )"
+            },
+            "AspNetCore.HealthChecks.UI.Client": {
+              "target": "Package",
+              "version": "[8.0.1, )"
+            },
+            "AspNetCore.HealthChecks.UI.InMemory.Storage": {
+              "target": "Package",
+              "version": "[8.0.1, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[8.0.11, )"
+            },
+            "Microsoft.Extensions.Diagnostics.HealthChecks": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Serilog.AspNetCore": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Serilog.Enrichers.Environment": {
+              "target": "Package",
+              "version": "[3.0.1, )"
+            },
+            "Serilog.Enrichers.Thread": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
+            "Serilog.Sinks.Console": {
+              "target": "Package",
+              "version": "[5.0.1, )"
+            },
+            "Serilog.Sinks.File": {
+              "target": "Package",
+              "version": "[5.0.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -79,14 +115,14 @@
         }
       }
     },
-    "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
+    "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
+        "projectUniqueName": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
         "projectName": "AgroSolutions.Domain",
-        "projectPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
+        "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
         "packagesPath": "/Users/lopes/.nuget/packages/",
-        "outputPath": "/Volumes/External/FIAP/Hackton/AgroSolutions.Domain/obj/",
+        "outputPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/lopes/.nuget/NuGet/NuGet.Config"

@@ -42,7 +42,7 @@ try
     {
         c.SwaggerDoc("v1", new OpenApiInfo
         {
-            Title = "AgroSolutions API - FASE 4: Observability & Final Delivery",
+            Title = "AgroSolutions API - FASE 5: Data Persistence",
             Version = "v1",
             Description = "API for high-performance ingestion of agricultural sensor data with full observability",
             Contact = new OpenApiContact
@@ -79,9 +79,13 @@ try
 
     // Register repositories
     builder.Services.AddScoped<ISensorReadingRepository, SensorReadingRepository>();
+    builder.Services.AddScoped<IFarmRepository, FarmRepository>();
+    builder.Services.AddScoped<IFieldRepository, FieldRepository>();
 
     // Register services
     builder.Services.AddScoped<IIngestionService, IngestionService>();
+    builder.Services.AddScoped<IFarmService, FarmService>();
+    builder.Services.AddScoped<IFieldService, FieldService>();
 
     // Add Health Checks
     builder.Services.AddHealthChecks()

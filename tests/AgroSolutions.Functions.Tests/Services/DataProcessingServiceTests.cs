@@ -1,5 +1,6 @@
 using AgroSolutions.Domain.Entities;
 using AgroSolutions.Functions.Services;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace AgroSolutions.Functions.Tests.Services;

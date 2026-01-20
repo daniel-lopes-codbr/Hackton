@@ -3,12 +3,20 @@ using AgroSolutions.Api.HealthChecks;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using HealthChecks.UI.Client;
+using HealthChecks.UI;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 // Configure Serilog
+// Ensure logs directory exists
+var logsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "logs");
+if (!Directory.Exists(logsDirectory))
+{
+    Directory.CreateDirectory(logsDirectory);
+}
+
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .WriteTo.File("logs/agrosolutions-.log", rollingInterval: RollingInterval.Day)
+    .WriteTo.File(Path.Combine(logsDirectory, "agrosolutions-.log"), rollingInterval: RollingInterval.Day)
     .Enrich.FromLogContext()
     .Enrich.WithEnvironmentName()
     .Enrich.WithMachineName()

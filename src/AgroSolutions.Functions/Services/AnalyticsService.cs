@@ -1,4 +1,5 @@
 using AgroSolutions.Domain.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace AgroSolutions.Functions.Services;
 

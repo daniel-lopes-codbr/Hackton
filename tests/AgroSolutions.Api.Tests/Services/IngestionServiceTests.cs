@@ -1,5 +1,6 @@
 using AgroSolutions.Api.Models;
 using AgroSolutions.Api.Services;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace AgroSolutions.Api.Tests.Services;

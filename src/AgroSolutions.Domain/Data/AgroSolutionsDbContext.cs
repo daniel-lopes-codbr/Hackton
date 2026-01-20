@@ -1,0 +1,91 @@
+using AgroSolutions.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace AgroSolutions.Domain.Data;
+
+/// <summary>
+/// DbContext for AgroSolutions application
+/// </summary>
+public class AgroSolutionsDbContext : DbContext
+{
+    public AgroSolutionsDbContext(DbContextOptions<AgroSolutionsDbContext> options)
+        : base(options)
+    {
+    }
+
+    public DbSet<Farm> Farms { get; set; }
+    public DbSet<Field> Fields { get; set; }
+    public DbSet<SensorReading> SensorReadings { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // Configure Farm
+        modelBuilder.Entity<Farm>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedNever(); // We generate GUIDs ourselves
+            entity.OwnsOne(e => e.Property, property =>
+            {
+                property.Property(p => p.Name).IsRequired().HasMaxLength(200);
+                property.Property(p => p.Location).IsRequired().HasMaxLength(500);
+                property.Property(p => p.Area).IsRequired().HasPrecision(18, 2);
+                property.Property(p => p.Description).HasMaxLength(1000);
+            });
+            entity.Property(e => e.OwnerName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.OwnerEmail).HasMaxLength(200);
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt);
+        });
+
+        // Configure Field
+        modelBuilder.Entity<Field>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.OwnsOne(e => e.Property, property =>
+            {
+                property.Property(p => p.Name).IsRequired().HasMaxLength(200);
+                property.Property(p => p.Location).IsRequired().HasMaxLength(500);
+                property.Property(p => p.Area).IsRequired().HasPrecision(18, 2);
+                property.Property(p => p.Description).HasMaxLength(1000);
+            });
+            entity.Property(e => e.FarmId).IsRequired();
+            entity.Property(e => e.CropType).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt);
+            
+            entity.HasIndex(e => e.FarmId);
+            entity.HasOne<Farm>()
+                .WithMany()
+                .HasForeignKey(e => e.FarmId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Configure SensorReading
+        modelBuilder.Entity<SensorReading>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.FieldId).IsRequired();
+            entity.Property(e => e.SensorType).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Value).IsRequired().HasPrecision(18, 4);
+            entity.Property(e => e.Unit).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.ReadingTimestamp).IsRequired();
+            entity.Property(e => e.Location).HasMaxLength(200);
+            entity.Property(e => e.Metadata)
+                .HasConversion(
+                    v => v == null ? null : System.Text.Json.JsonSerializer.Serialize(v),
+                    v => v == null ? null : System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(v))
+                .HasColumnType("nvarchar(max)");
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt);
+            
+            entity.HasIndex(e => e.FieldId);
+            entity.HasIndex(e => e.SensorType);
+            entity.HasIndex(e => e.ReadingTimestamp);
+            entity.HasIndex(e => new { e.FieldId, e.SensorType, e.ReadingTimestamp });
+        });
+    }
+}

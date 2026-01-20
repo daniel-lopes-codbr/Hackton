@@ -1,5 +1,8 @@
 using AgroSolutions.Api.Models;
 using AgroSolutions.Api.Services;
+using AgroSolutions.Domain.Data;
+using AgroSolutions.Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
@@ -9,11 +12,19 @@ public class IngestionServiceTests
 {
     private readonly IngestionService _service;
     private readonly ILogger<IngestionService> _logger;
+    private readonly AgroSolutionsDbContext _context;
+    private readonly ISensorReadingRepository _repository;
 
     public IngestionServiceTests()
     {
+        var options = new DbContextOptionsBuilder<AgroSolutionsDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+        
+        _context = new AgroSolutionsDbContext(options);
+        _repository = new SensorReadingRepository(_context);
         _logger = new LoggerFactory().CreateLogger<IngestionService>();
-        _service = new IngestionService(_logger);
+        _service = new IngestionService(_logger, _repository);
     }
 
     [Fact]
@@ -151,8 +162,13 @@ public class IngestionServiceTests
         var sequentialResult = await _service.IngestBatchAsync(batchDto);
         var sequentialTime = DateTime.UtcNow - sequentialStart;
 
-        // Create new service instance to avoid state issues
-        var service2 = new IngestionService(_logger);
+        // Create new service instance with new context to avoid state issues
+        var options2 = new DbContextOptionsBuilder<AgroSolutionsDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+        var context2 = new AgroSolutionsDbContext(options2);
+        var repository2 = new SensorReadingRepository(context2);
+        var service2 = new IngestionService(_logger, repository2);
         var parallelStart = DateTime.UtcNow;
         var parallelResult = await service2.IngestBatchParallelAsync(batchDto);
         var parallelTime = DateTime.UtcNow - parallelStart;

@@ -10,11 +10,15 @@ AgroSolutions/
 │   ├── AgroSolutions.Domain/      # Core do Domínio (FASE 1)
 │   │   ├── Entities/             # Entidades de domínio
 │   │   ├── ValueObjects/          # Objetos de valor
-│   │   └── Exceptions/            # Exceções de domínio
+│   │   ├── Exceptions/            # Exceções de domínio
+│   │   ├── Data/                  # DbContext (FASE 5)
+│   │   └── Repositories/          # Repositórios (FASE 5)
 │   ├── AgroSolutions.Api/         # API de Ingestão (FASE 2)
 │   │   ├── Controllers/           # Controllers da API
 │   │   ├── Services/              # Serviços de ingestão
-│   │   └── Models/                # DTOs
+│   │   ├── Models/                # DTOs
+│   │   ├── HealthChecks/          # Health checks (FASE 4)
+│   │   └── Migrations/             # EF Core Migrations (FASE 5)
 │   └── AgroSolutions.Functions/   # Workers & Inteligência (FASE 3)
 │       ├── Functions/             # Azure Functions
 │       └── Services/              # Serviços de processamento e analytics
@@ -268,11 +272,65 @@ Testes unitários cobrindo:
 
 Consulte `DEPLOYMENT.md` para instruções detalhadas de deployment.
 
-## Status do Projeto
+## FASE 5: Persistência de Dados (Entity Framework Core) ✅
+
+### Implementado:
+
+1. **Entity Framework Core**
+   - EF Core 8.0 configurado no projeto Domain
+   - Suporte para SQL Server e InMemory Database
+   - Configuração de DbContext com mapeamento completo
+   - Conversão de tipos complexos (Dictionary para JSON)
+
+2. **AgroSolutionsDbContext**
+   - DbContext configurado para todas as entidades
+   - Configuração de relacionamentos (Farm -> Field)
+   - Índices otimizados para consultas
+   - Value Objects mapeados como Owned Entities
+
+3. **Repositórios**
+   - `ISensorReadingRepository`: Interface do repositório
+   - `SensorReadingRepository`: Implementação com EF Core
+   - Métodos para consultas otimizadas
+   - Suporte a operações em lote
+
+4. **Atualização de Serviços**
+   - `IngestionService` atualizado para usar repositório
+   - Persistência real de dados (não mais em memória)
+   - Operações batch otimizadas
+   - Transações gerenciadas pelo EF Core
+
+5. **Configuração de Banco de Dados**
+   - InMemory Database para desenvolvimento
+   - SQL Server para produção
+   - Connection string configurável
+   - Retry policy configurada
+
+6. **Testes Atualizados**
+   - Testes atualizados para usar InMemory Database
+   - Isolamento de testes com DbContext separado
+   - Testes de integração com banco
+
+### Características de Persistência:
+
+- **EF Core**: ORM completo com migrations
+- **Repository Pattern**: Abstração de acesso a dados
+- **InMemory para Dev**: Desenvolvimento sem necessidade de SQL Server
+- **SQL Server para Prod**: Pronto para produção
+- **Migrations**: Suporte a versionamento de schema
+
+### Configuração:
+
+- **Development**: Usa InMemory Database automaticamente
+- **Production**: Configurar connection string em `appsettings.json`
+- **Migrations**: Criar com `dotnet ef migrations add InitialCreate`
+
+### Status do Projeto
 
 ✅ **FASE 1**: Core do Domínio - Concluída
 ✅ **FASE 2**: Ingestão de Alta Performance - Concluída
 ✅ **FASE 3**: Workers & Inteligência - Concluída
 ✅ **FASE 4**: Observabilidade & Entrega Final - Concluída
+✅ **FASE 5**: Persistência de Dados - Concluída
 
-**MVP Completo e Pronto para Produção!** 🎉
+**MVP Completo com Persistência de Dados!** 🎉

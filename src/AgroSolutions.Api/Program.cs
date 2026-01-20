@@ -1,6 +1,9 @@
 using AgroSolutions.Api.Services;
 using AgroSolutions.Api.HealthChecks;
+using AgroSolutions.Domain.Data;
+using AgroSolutions.Domain.Repositories;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using HealthChecks.UI.Client;
 using HealthChecks.UI;
@@ -49,6 +52,33 @@ try
             }
         });
     });
+
+    // Configure Database
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+        ?? "Server=localhost;Database=AgroSolutions;Trusted_Connection=true;TrustServerCertificate=true;";
+    
+    builder.Services.AddDbContext<AgroSolutionsDbContext>(options =>
+    {
+        // Use InMemory for development, SQL Server for production
+        if (builder.Environment.IsDevelopment() || string.IsNullOrEmpty(connectionString) || connectionString.Contains(":memory:"))
+        {
+            options.UseInMemoryDatabase("AgroSolutionsDb");
+        }
+        else
+        {
+            options.UseSqlServer(connectionString, sqlOptions =>
+            {
+                sqlOptions.MigrationsAssembly("AgroSolutions.Api");
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
+            });
+        }
+    });
+
+    // Register repositories
+    builder.Services.AddScoped<ISensorReadingRepository, SensorReadingRepository>();
 
     // Register services
     builder.Services.AddScoped<IIngestionService, IngestionService>();
@@ -134,6 +164,18 @@ try
         options.UIPath = "/health-ui";
         options.ApiPath = "/health-ui-api";
     });
+
+    // Ensure database is created (for InMemory or development)
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<AgroSolutionsDbContext>();
+        if (app.Environment.IsDevelopment())
+        {
+            // InMemory database is created automatically
+            // For SQL Server, uncomment the line below to apply migrations
+            // context.Database.Migrate();
+        }
+    }
 
     Log.Information("AgroSolutions API started successfully");
 

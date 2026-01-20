@@ -18,29 +18,31 @@ public class IngestionHealthCheck : IHealthCheck
         _logger = logger;
     }
 
-    public Task<HealthCheckResult> CheckHealthAsync(
+    public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
         try
         {
             // Simple health check - verify service is available
+            // Note: Using GetAllReadings() which returns empty for now
+            // In production, you might want to query the database directly
             var readings = _ingestionService.GetAllReadings();
             
-            return Task.FromResult(HealthCheckResult.Healthy(
+            return HealthCheckResult.Healthy(
                 "Ingestion service is operational",
                 new Dictionary<string, object>
                 {
                     { "total_readings", readings.Count() },
                     { "timestamp", DateTime.UtcNow }
-                }));
+                });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Health check failed for ingestion service");
-            return Task.FromResult(HealthCheckResult.Unhealthy(
+            return HealthCheckResult.Unhealthy(
                 "Ingestion service is not operational",
-                ex));
+                ex);
         }
     }
 }

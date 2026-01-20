@@ -16,6 +16,7 @@ public class AgroSolutionsDbContext : DbContext
     public DbSet<Farm> Farms { get; set; }
     public DbSet<Field> Fields { get; set; }
     public DbSet<SensorReading> SensorReadings { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -86,6 +87,22 @@ public class AgroSolutionsDbContext : DbContext
             entity.HasIndex(e => e.SensorType);
             entity.HasIndex(e => e.ReadingTimestamp);
             entity.HasIndex(e => new { e.FieldId, e.SensorType, e.ReadingTimestamp });
+        });
+
+        // Configure User
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Email).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Role).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt);
+            
+            entity.HasIndex(e => e.Email).IsUnique();
+            entity.HasIndex(e => e.Role);
         });
     }
 }

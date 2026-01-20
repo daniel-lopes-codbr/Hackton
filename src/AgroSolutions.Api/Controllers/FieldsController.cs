@@ -1,5 +1,6 @@
 using AgroSolutions.Api.Models;
 using AgroSolutions.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AgroSolutions.Api.Controllers;
@@ -10,6 +11,7 @@ namespace AgroSolutions.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
+[Authorize] // All endpoints require authentication
 public class FieldsController : ControllerBase
 {
     private readonly IFieldService _fieldService;
@@ -22,10 +24,12 @@ public class FieldsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all fields
+    /// Get all fields (User or Admin)
     /// </summary>
     [HttpGet]
+    [Authorize(Roles = "User,Admin")]
     [ProducesResponseType(typeof(IEnumerable<FieldDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
     {
         var fields = await _fieldService.GetAllAsync(cancellationToken);
@@ -33,10 +37,12 @@ public class FieldsController : ControllerBase
     }
 
     /// <summary>
-    /// Get fields by farm ID
+    /// Get fields by farm ID (User or Admin)
     /// </summary>
     [HttpGet("farm/{farmId}")]
+    [Authorize(Roles = "User,Admin")]
     [ProducesResponseType(typeof(IEnumerable<FieldDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetByFarmId(Guid farmId, CancellationToken cancellationToken = default)
     {
         var fields = await _fieldService.GetByFarmIdAsync(farmId, cancellationToken);
@@ -44,11 +50,13 @@ public class FieldsController : ControllerBase
     }
 
     /// <summary>
-    /// Get field by ID
+    /// Get field by ID (User or Admin)
     /// </summary>
     [HttpGet("{id}")]
+    [Authorize(Roles = "User,Admin")]
     [ProducesResponseType(typeof(FieldDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken = default)
     {
         var field = await _fieldService.GetByIdAsync(id, cancellationToken);
@@ -59,12 +67,14 @@ public class FieldsController : ControllerBase
     }
 
     /// <summary>
-    /// Create a new field for a farm
+    /// Create a new field for a farm (Admin only)
     /// </summary>
     [HttpPost("farm/{farmId}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(FieldDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Create(Guid farmId, [FromBody] CreateFieldDto dto, CancellationToken cancellationToken = default)
     {
         try
@@ -84,12 +94,14 @@ public class FieldsController : ControllerBase
     }
 
     /// <summary>
-    /// Update an existing field
+    /// Update an existing field (Admin only)
     /// </summary>
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(FieldDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateFieldDto dto, CancellationToken cancellationToken = default)
     {
         try
@@ -108,12 +120,14 @@ public class FieldsController : ControllerBase
     }
 
     /// <summary>
-    /// Delete a field
+    /// Delete a field (Admin only)
     /// </summary>
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
     {
         try

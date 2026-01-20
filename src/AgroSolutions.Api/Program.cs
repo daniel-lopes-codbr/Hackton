@@ -4,6 +4,9 @@ using AgroSolutions.Domain.Data;
 using AgroSolutions.Domain.Repositories;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Serilog;
 using HealthChecks.UI.Client;
 using HealthChecks.UI;
@@ -81,11 +84,45 @@ try
     builder.Services.AddScoped<ISensorReadingRepository, SensorReadingRepository>();
     builder.Services.AddScoped<IFarmRepository, FarmRepository>();
     builder.Services.AddScoped<IFieldRepository, FieldRepository>();
+    builder.Services.AddScoped<IUserRepository, UserRepository>();
 
     // Register services
     builder.Services.AddScoped<IIngestionService, IngestionService>();
     builder.Services.AddScoped<IFarmService, FarmService>();
     builder.Services.AddScoped<IFieldService, FieldService>();
+    builder.Services.AddScoped<IUserService, UserService>();
+    builder.Services.AddScoped<IAuthService, AuthService>();
+
+    // Configure JWT Authentication
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+    var secretKey = jwtSettings["SecretKey"] ?? "YourSuperSecretKeyThatShouldBeInConfigurationAndAtLeast32CharactersLong";
+    var issuer = jwtSettings["Issuer"] ?? "AgroSolutions";
+    var audience = jwtSettings["Audience"] ?? "AgroSolutions";
+
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+        };
+    });
+
+    builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+        options.AddPolicy("UserOrAdmin", policy => policy.RequireRole("User", "Admin"));
+    });
 
     // Add Health Checks
     builder.Services.AddHealthChecks()
@@ -142,6 +179,7 @@ try
         };
     });
 
+    app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
 

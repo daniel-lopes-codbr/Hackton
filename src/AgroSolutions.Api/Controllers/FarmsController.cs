@@ -1,5 +1,6 @@
 using AgroSolutions.Api.Models;
 using AgroSolutions.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AgroSolutions.Api.Controllers;
@@ -10,6 +11,7 @@ namespace AgroSolutions.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
+[Authorize] // All endpoints require authentication
 public class FarmsController : ControllerBase
 {
     private readonly IFarmService _farmService;
@@ -22,10 +24,12 @@ public class FarmsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all farms
+    /// Get all farms (User or Admin)
     /// </summary>
     [HttpGet]
+    [Authorize(Roles = "User,Admin")]
     [ProducesResponseType(typeof(IEnumerable<FarmDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
     {
         var farms = await _farmService.GetAllAsync(cancellationToken);
@@ -33,11 +37,13 @@ public class FarmsController : ControllerBase
     }
 
     /// <summary>
-    /// Get farm by ID
+    /// Get farm by ID (User or Admin)
     /// </summary>
     [HttpGet("{id}")]
+    [Authorize(Roles = "User,Admin")]
     [ProducesResponseType(typeof(FarmDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken = default)
     {
         var farm = await _farmService.GetByIdAsync(id, cancellationToken);
@@ -48,11 +54,13 @@ public class FarmsController : ControllerBase
     }
 
     /// <summary>
-    /// Create a new farm
+    /// Create a new farm (Admin only)
     /// </summary>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(FarmDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Create([FromBody] CreateFarmDto dto, CancellationToken cancellationToken = default)
     {
         try
@@ -68,12 +76,14 @@ public class FarmsController : ControllerBase
     }
 
     /// <summary>
-    /// Update an existing farm
+    /// Update an existing farm (Admin only)
     /// </summary>
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(FarmDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateFarmDto dto, CancellationToken cancellationToken = default)
     {
         try
@@ -92,12 +102,14 @@ public class FarmsController : ControllerBase
     }
 
     /// <summary>
-    /// Delete a farm
+    /// Delete a farm (Admin only)
     /// </summary>
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
     {
         try

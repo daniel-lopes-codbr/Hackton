@@ -1,5 +1,6 @@
 using AgroSolutions.Api.Models;
 using AgroSolutions.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AgroSolutions.Api.Controllers;
@@ -22,14 +23,16 @@ public class IngestionController : ControllerBase
     }
 
     /// <summary>
-    /// Ingests a single sensor reading
+    /// Ingests a single sensor reading (Admin only)
     /// </summary>
     /// <param name="dto">Sensor reading data</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Created sensor reading</returns>
     [HttpPost("single")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(SensorReadingDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> IngestSingle(
         [FromBody] SensorReadingDto dto,
         CancellationToken cancellationToken = default)
@@ -59,14 +62,16 @@ public class IngestionController : ControllerBase
     }
 
     /// <summary>
-    /// Ingests multiple sensor readings in batch (sequential processing)
+    /// Ingests multiple sensor readings in batch (sequential processing) (Admin only)
     /// </summary>
     /// <param name="batchDto">Batch of sensor readings</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Ingestion response with processing statistics</returns>
     [HttpPost("batch")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(IngestionResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> IngestBatch(
         [FromBody] BatchSensorReadingDto batchDto,
         CancellationToken cancellationToken = default)
@@ -84,14 +89,16 @@ public class IngestionController : ControllerBase
     }
 
     /// <summary>
-    /// Ingests multiple sensor readings in parallel for maximum performance
+    /// Ingests multiple sensor readings in parallel for maximum performance (Admin only)
     /// </summary>
     /// <param name="batchDto">Batch of sensor readings</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Ingestion response with processing statistics</returns>
     [HttpPost("batch/parallel")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(IngestionResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> IngestBatchParallel(
         [FromBody] BatchSensorReadingDto batchDto,
         CancellationToken cancellationToken = default)

@@ -77,8 +77,8 @@ public class AgroSolutionsDbContext : DbContext
             entity.Property(e => e.Location).HasMaxLength(200);
             entity.Property(e => e.Metadata)
                 .HasConversion(
-                    v => v == null ? null : System.Text.Json.JsonSerializer.Serialize(v),
-                    v => v == null ? null : System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(v))
+                    v => v == null ? (string?)null : ConvertDictionaryToJson(v),
+                    v => string.IsNullOrEmpty(v) ? null : ConvertJsonToDictionary(v))
                 .HasColumnType("nvarchar(max)");
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt);
@@ -104,5 +104,21 @@ public class AgroSolutionsDbContext : DbContext
             entity.HasIndex(e => e.Email).IsUnique();
             entity.HasIndex(e => e.Role);
         });
+    }
+
+    private static string? ConvertDictionaryToJson(Dictionary<string, string>? dictionary)
+    {
+        if (dictionary == null)
+            return null;
+        
+        return System.Text.Json.JsonSerializer.Serialize(dictionary);
+    }
+
+    private static Dictionary<string, string>? ConvertJsonToDictionary(string? json)
+    {
+        if (string.IsNullOrEmpty(json))
+            return null;
+        
+        return System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(json);
     }
 }

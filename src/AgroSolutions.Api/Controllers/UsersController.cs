@@ -59,8 +59,12 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var user = await _userService.CreateAsync(dto, cancellationToken);
-            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+            var result = await _userService.CreateUserAsync(dto, cancellationToken);
+            
+            if (!result.IsSuccess)
+                return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+            
+            return CreatedAtAction(nameof(GetById), new { id = result.Value!.Id }, result.Value);
         }
         catch (Exception ex)
         {
@@ -80,11 +84,17 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var user = await _userService.UpdateAsync(id, dto, cancellationToken);
-            if (user == null)
-                return NotFound(new { error = $"User with ID {id} not found" });
+            var result = await _userService.UpdateUserAsync(id, dto, cancellationToken);
+            
+            if (!result.IsSuccess)
+            {
+                if (result.Errors.Any(e => e.Message.Contains("not found")))
+                    return NotFound(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+                
+                return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+            }
 
-            return Ok(user);
+            return Ok(result.Value);
         }
         catch (Exception ex)
         {
@@ -104,9 +114,15 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var deleted = await _userService.DeleteAsync(id, cancellationToken);
-            if (!deleted)
-                return NotFound(new { error = $"User with ID {id} not found" });
+            var result = await _userService.DeleteUserAsync(id, cancellationToken);
+            
+            if (!result.IsSuccess)
+            {
+                if (result.Errors.Any(e => e.Message.Contains("not found")))
+                    return NotFound(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+                
+                return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+            }
 
             return NoContent();
         }

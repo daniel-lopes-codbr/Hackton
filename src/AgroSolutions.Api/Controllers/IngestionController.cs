@@ -39,20 +39,12 @@ public class IngestionController : ControllerBase
     {
         try
         {
-            var reading = await _ingestionService.IngestSingleAsync(dto, cancellationToken);
-            
-            var responseDto = new SensorReadingDto
-            {
-                FieldId = reading.FieldId,
-                SensorType = reading.SensorType,
-                Value = reading.Value,
-                Unit = reading.Unit,
-                ReadingTimestamp = reading.ReadingTimestamp,
-                Location = reading.Location,
-                Metadata = reading.Metadata
-            };
-
-            return CreatedAtAction(nameof(IngestSingle), new { id = reading.Id }, responseDto);
+                var result = await _ingestionService.IngestSingleAsync(dto, cancellationToken);
+                
+                if (!result.IsSuccess)
+                    return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+                
+                return CreatedAtAction(nameof(IngestSingle), new { id = result.Value!.FieldId }, result.Value);
         }
         catch (Exception ex)
         {
@@ -78,8 +70,12 @@ public class IngestionController : ControllerBase
     {
         try
         {
-            var response = await _ingestionService.IngestBatchAsync(batchDto, cancellationToken);
-            return Ok(response);
+                var result = await _ingestionService.IngestBatchAsync(batchDto, cancellationToken);
+                
+                if (!result.IsSuccess)
+                    return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+                
+                return Ok(result.Value);
         }
         catch (Exception ex)
         {
@@ -105,8 +101,12 @@ public class IngestionController : ControllerBase
     {
         try
         {
-            var response = await _ingestionService.IngestBatchParallelAsync(batchDto, cancellationToken);
-            return Ok(response);
+                var result = await _ingestionService.IngestBatchParallelAsync(batchDto, cancellationToken);
+                
+                if (!result.IsSuccess)
+                    return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+                
+                return Ok(result.Value);
         }
         catch (Exception ex)
         {

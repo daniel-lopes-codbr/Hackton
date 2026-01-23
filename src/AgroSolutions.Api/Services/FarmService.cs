@@ -1,152 +1,79 @@
+using AgroSolutions.Api.Application.Commands.Farms;
+using AgroSolutions.Api.Application.Common.Results;
+using AgroSolutions.Api.Application.Queries.Farms;
 using AgroSolutions.Api.Models;
-using AgroSolutions.Domain.Entities;
-using AgroSolutions.Domain.Exceptions;
 using AgroSolutions.Domain.Repositories;
-using AgroSolutions.Domain.ValueObjects;
+using AutoMapper;
+using MediatR;
 
 namespace AgroSolutions.Api.Services;
 
 /// <summary>
-/// Service implementation for Farm management
+/// Service implementation for Farm management (uses MediatR internally)
 /// </summary>
 public class FarmService : IFarmService
 {
-    private readonly IFarmRepository _repository;
+    private readonly IMediator _mediator;
+    private readonly IMapper _mapper;
+    private readonly IFarmRepository _repository; // Keep for simple queries
     private readonly ILogger<FarmService> _logger;
 
-    public FarmService(IFarmRepository repository, ILogger<FarmService> logger)
+    public FarmService(
+        IMediator mediator,
+        IMapper mapper,
+        IFarmRepository repository,
+        ILogger<FarmService> logger)
     {
+        _mediator = mediator;
+        _mapper = mapper;
         _repository = repository;
         _logger = logger;
     }
 
     public async Task<IEnumerable<FarmDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        var farms = await _repository.GetAllAsync(cancellationToken);
-        return farms.Select(MapToDto);
+        // Use Query via MediatR
+        var query = new GetAllFarmsQuery();
+        return await _mediator.Send(query, cancellationToken);
     }
 
     public async Task<FarmDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var farm = await _repository.GetByIdAsync(id, cancellationToken);
-        return farm == null ? null : MapToDto(farm);
+        // Use Query via MediatR
+        var query = new GetFarmByIdQuery { Id = id };
+        return await _mediator.Send(query, cancellationToken);
     }
 
-    public async Task<FarmDto> CreateAsync(CreateFarmDto dto, CancellationToken cancellationToken = default)
+    public async Task<Result<FarmDto>> CreateFarmAsync(CreateFarmDto dto, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var property = new Property(
-                dto.Property.Name,
-                dto.Property.Location,
-                dto.Property.Area,
-                dto.Property.Description
-            );
-
-            var farm = new Farm(
-                property,
-                dto.OwnerName,
-                dto.OwnerEmail,
-                dto.OwnerPhone
-            );
-
-            await _repository.AddAsync(farm, cancellationToken);
-            await _repository.SaveChangesAsync(cancellationToken);
-
-            _logger.LogInformation("Created farm {FarmId} for owner {OwnerName}", farm.Id, farm.OwnerName);
-
-            return MapToDto(farm);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating farm");
-            throw new DomainException($"Failed to create farm: {ex.Message}", ex);
-        }
+        // Map DTO → Command using AutoMapper
+        var command = _mapper.Map<CreateFarmCommand>(dto);
+        
+        // Send Command via MediatR
+        return await _mediator.Send(command, cancellationToken);
     }
 
-    public async Task<FarmDto?> UpdateAsync(Guid id, UpdateFarmDto dto, CancellationToken cancellationToken = default)
+    public async Task<Result<FarmDto>> UpdateFarmAsync(Guid id, UpdateFarmDto dto, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var farm = await _repository.GetByIdAsync(id, cancellationToken);
-            if (farm == null)
-                return null;
-
-            if (dto.Property != null)
-            {
-                var property = new Property(
-                    dto.Property.Name,
-                    dto.Property.Location,
-                    dto.Property.Area,
-                    dto.Property.Description
-                );
-                farm.UpdateProperty(property);
-            }
-
-            if (!string.IsNullOrWhiteSpace(dto.OwnerName))
-            {
-                farm.UpdateOwnerInfo(
-                    dto.OwnerName,
-                    dto.OwnerEmail,
-                    dto.OwnerPhone
-                );
-            }
-
-            await _repository.UpdateAsync(farm, cancellationToken);
-            await _repository.SaveChangesAsync(cancellationToken);
-
-            _logger.LogInformation("Updated farm {FarmId}", farm.Id);
-
-            return MapToDto(farm);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating farm {FarmId}", id);
-            throw new DomainException($"Failed to update farm: {ex.Message}", ex);
-        }
+        // Map DTO → Command using AutoMapper
+        var command = _mapper.Map<UpdateFarmCommand>(dto);
+        command.Id = id; // Set ID from route parameter
+        
+        // Send Command via MediatR
+        return await _mediator.Send(command, cancellationToken);
     }
 
-    public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Result> DeleteFarmAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var deleted = await _repository.DeleteAsync(id, cancellationToken);
-            if (deleted)
-            {
-                await _repository.SaveChangesAsync(cancellationToken);
-                _logger.LogInformation("Deleted farm {FarmId}", id);
-            }
-            return deleted;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting farm {FarmId}", id);
-            throw new DomainException($"Failed to delete farm: {ex.Message}", ex);
-        }
+        // Create Command
+        var command = new DeleteFarmCommand { Id = id };
+        
+        // Send Command via MediatR
+        return await _mediator.Send(command, cancellationToken);
     }
 
     public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _repository.ExistsAsync(id, cancellationToken);
-    }
-
-    private static FarmDto MapToDto(Farm farm)
-    {
-        return new FarmDto
-        {
-            Id = farm.Id,
-            Property = new PropertyDto
-            {
-                Name = farm.Property.Name,
-                Location = farm.Property.Location,
-                Area = farm.Property.Area,
-                Description = farm.Property.Description
-            },
-            OwnerName = farm.OwnerName,
-            OwnerEmail = farm.OwnerEmail,
-            OwnerPhone = farm.OwnerPhone,
-            CreatedAt = farm.CreatedAt,
-            UpdatedAt = farm.UpdatedAt
-        };
     }
 }

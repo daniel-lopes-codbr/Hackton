@@ -1,5 +1,5 @@
+using AgroSolutions.Api.Application.Common.Results;
 using AgroSolutions.Api.Models;
-using AgroSolutions.Domain.Entities;
 
 namespace AgroSolutions.Api.Services;
 
@@ -11,20 +11,15 @@ public interface IIngestionService
     /// <summary>
     /// Ingests a single sensor reading
     /// </summary>
-    Task<SensorReading> IngestSingleAsync(SensorReadingDto dto, CancellationToken cancellationToken = default);
+    Task<Result<SensorReadingDto>> IngestSingleAsync(SensorReadingDto dto, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Ingests multiple sensor readings in batch with high performance
     /// </summary>
-    Task<IngestionResponseDto> IngestBatchAsync(BatchSensorReadingDto batchDto, CancellationToken cancellationToken = default);
+    Task<Result<IngestionResponseDto>> IngestBatchAsync(BatchSensorReadingDto batchDto, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Ingests multiple sensor readings in parallel for maximum performance
     /// </summary>
-    Task<IngestionResponseDto> IngestBatchParallelAsync(BatchSensorReadingDto batchDto, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Gets all ingested readings (for health checks and testing)
-    /// </summary>
-    IEnumerable<SensorReading> GetAllReadings();
+    Task<Result<IngestionResponseDto>> IngestBatchParallelAsync(BatchSensorReadingDto batchDto, CancellationToken cancellationToken = default);
 }

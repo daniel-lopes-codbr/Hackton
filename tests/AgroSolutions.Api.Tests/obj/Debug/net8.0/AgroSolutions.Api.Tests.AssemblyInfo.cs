@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AgroSolutions.Api.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d80a7b4b381f8c5c66c0787e2ca24a7444da1010")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+37ea49b38535b355bc6cba7672bf3a54af54a2e4")]
 [assembly: System.Reflection.AssemblyProductAttribute("AgroSolutions.Api.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AgroSolutions.Api.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,170 +1,87 @@
+using AgroSolutions.Api.Application.Commands.Fields;
+using AgroSolutions.Api.Application.Common.Results;
+using AgroSolutions.Api.Application.Queries.Fields;
 using AgroSolutions.Api.Models;
-using AgroSolutions.Domain.Entities;
-using AgroSolutions.Domain.Exceptions;
 using AgroSolutions.Domain.Repositories;
-using AgroSolutions.Domain.ValueObjects;
+using AutoMapper;
+using MediatR;
 
 namespace AgroSolutions.Api.Services;
 
 /// <summary>
-/// Service implementation for Field management
+/// Service implementation for Field management (uses MediatR internally)
 /// </summary>
 public class FieldService : IFieldService
 {
-    private readonly IFieldRepository _fieldRepository;
-    private readonly IFarmRepository _farmRepository;
+    private readonly IMediator _mediator;
+    private readonly IMapper _mapper;
+    private readonly IFieldRepository _repository; // Keep for simple queries
     private readonly ILogger<FieldService> _logger;
 
     public FieldService(
-        IFieldRepository fieldRepository,
-        IFarmRepository farmRepository,
+        IMediator mediator,
+        IMapper mapper,
+        IFieldRepository repository,
         ILogger<FieldService> logger)
     {
-        _fieldRepository = fieldRepository;
-        _farmRepository = farmRepository;
+        _mediator = mediator;
+        _mapper = mapper;
+        _repository = repository;
         _logger = logger;
     }
 
     public async Task<IEnumerable<FieldDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        var fields = await _fieldRepository.GetAllAsync(cancellationToken);
-        return fields.Select(MapToDto);
+        // Use Query via MediatR
+        var query = new GetAllFieldsQuery();
+        return await _mediator.Send(query, cancellationToken);
     }
 
     public async Task<IEnumerable<FieldDto>> GetByFarmIdAsync(Guid farmId, CancellationToken cancellationToken = default)
     {
-        var fields = await _fieldRepository.GetByFarmIdAsync(farmId, cancellationToken);
-        return fields.Select(MapToDto);
+        // Use Query via MediatR
+        var query = new GetFieldsByFarmIdQuery { FarmId = farmId };
+        return await _mediator.Send(query, cancellationToken);
     }
 
     public async Task<FieldDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var field = await _fieldRepository.GetByIdAsync(id, cancellationToken);
-        return field == null ? null : MapToDto(field);
+        // Use Query via MediatR
+        var query = new GetFieldByIdQuery { Id = id };
+        return await _mediator.Send(query, cancellationToken);
     }
 
-    public async Task<FieldDto> CreateAsync(Guid farmId, CreateFieldDto dto, CancellationToken cancellationToken = default)
+    public async Task<Result<FieldDto>> CreateFieldAsync(Guid farmId, CreateFieldDto dto, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            // Verify farm exists
-            var farm = await _farmRepository.GetByIdAsync(farmId, cancellationToken);
-            if (farm == null)
-                throw new DomainException($"Farm with ID {farmId} not found");
-
-            var property = new Property(
-                dto.Property.Name,
-                dto.Property.Location,
-                dto.Property.Area,
-                dto.Property.Description
-            );
-
-            var field = new Field(
-                farmId,
-                property,
-                dto.CropType,
-                dto.PlantingDate,
-                dto.HarvestDate
-            );
-
-            await _fieldRepository.AddAsync(field, cancellationToken);
-            await _fieldRepository.SaveChangesAsync(cancellationToken);
-
-            _logger.LogInformation("Created field {FieldId} for farm {FarmId}", field.Id, farmId);
-
-            return MapToDto(field);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating field for farm {FarmId}", farmId);
-            throw new DomainException($"Failed to create field: {ex.Message}", ex);
-        }
+        // Map DTO → Command using AutoMapper
+        var command = _mapper.Map<CreateFieldCommand>(dto);
+        command.FarmId = farmId; // Set FarmId from route parameter
+        
+        // Send Command via MediatR
+        return await _mediator.Send(command, cancellationToken);
     }
 
-    public async Task<FieldDto?> UpdateAsync(Guid id, UpdateFieldDto dto, CancellationToken cancellationToken = default)
+    public async Task<Result<FieldDto>> UpdateFieldAsync(Guid id, UpdateFieldDto dto, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var field = await _fieldRepository.GetByIdAsync(id, cancellationToken);
-            if (field == null)
-                return null;
-
-            if (dto.Property != null)
-            {
-                var property = new Property(
-                    dto.Property.Name,
-                    dto.Property.Location,
-                    dto.Property.Area,
-                    dto.Property.Description
-                );
-                field.UpdateProperty(property);
-            }
-
-            if (!string.IsNullOrWhiteSpace(dto.CropType))
-            {
-                field.UpdateCropInfo(
-                    dto.CropType,
-                    dto.PlantingDate,
-                    dto.HarvestDate
-                );
-            }
-
-            await _fieldRepository.UpdateAsync(field, cancellationToken);
-            await _fieldRepository.SaveChangesAsync(cancellationToken);
-
-            _logger.LogInformation("Updated field {FieldId}", field.Id);
-
-            return MapToDto(field);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating field {FieldId}", id);
-            throw new DomainException($"Failed to update field: {ex.Message}", ex);
-        }
+        // Map DTO → Command using AutoMapper
+        var command = _mapper.Map<UpdateFieldCommand>(dto);
+        command.Id = id; // Set ID from route parameter
+        
+        // Send Command via MediatR
+        return await _mediator.Send(command, cancellationToken);
     }
 
-    public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Result> DeleteFieldAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var deleted = await _fieldRepository.DeleteAsync(id, cancellationToken);
-            if (deleted)
-            {
-                await _fieldRepository.SaveChangesAsync(cancellationToken);
-                _logger.LogInformation("Deleted field {FieldId}", id);
-            }
-            return deleted;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting field {FieldId}", id);
-            throw new DomainException($"Failed to delete field: {ex.Message}", ex);
-        }
+        // Create Command
+        var command = new DeleteFieldCommand { Id = id };
+        
+        // Send Command via MediatR
+        return await _mediator.Send(command, cancellationToken);
     }
 
     public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _fieldRepository.ExistsAsync(id, cancellationToken);
-    }
-
-    private static FieldDto MapToDto(Field field)
-    {
-        return new FieldDto
-        {
-            Id = field.Id,
-            FarmId = field.FarmId,
-            Property = new PropertyDto
-            {
-                Name = field.Property.Name,
-                Location = field.Property.Location,
-                Area = field.Property.Area,
-                Description = field.Property.Description
-            },
-            CropType = field.CropType,
-            PlantingDate = field.PlantingDate,
-            HarvestDate = field.HarvestDate,
-            CreatedAt = field.CreatedAt,
-            UpdatedAt = field.UpdatedAt
-        };
+        return await _repository.ExistsAsync(id, cancellationToken);
     }
 }

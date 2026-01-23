@@ -79,12 +79,17 @@ public class FieldsController : ControllerBase
     {
         try
         {
-            var field = await _fieldService.CreateAsync(farmId, dto, cancellationToken);
-            return CreatedAtAction(nameof(GetById), new { id = field.Id }, field);
-        }
-        catch (AgroSolutions.Domain.Exceptions.DomainException ex) when (ex.Message.Contains("not found"))
-        {
-            return NotFound(new { error = ex.Message });
+            var result = await _fieldService.CreateFieldAsync(farmId, dto, cancellationToken);
+            
+            if (!result.IsSuccess)
+            {
+                if (result.Errors.Any(e => e.Message.Contains("not found")))
+                    return NotFound(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+                
+                return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+            }
+            
+            return CreatedAtAction(nameof(GetById), new { id = result.Value!.Id }, result.Value);
         }
         catch (Exception ex)
         {
@@ -106,11 +111,17 @@ public class FieldsController : ControllerBase
     {
         try
         {
-            var field = await _fieldService.UpdateAsync(id, dto, cancellationToken);
-            if (field == null)
-                return NotFound(new { error = $"Field with ID {id} not found" });
+            var result = await _fieldService.UpdateFieldAsync(id, dto, cancellationToken);
+            
+            if (!result.IsSuccess)
+            {
+                if (result.Errors.Any(e => e.Message.Contains("not found")))
+                    return NotFound(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+                
+                return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+            }
 
-            return Ok(field);
+            return Ok(result.Value);
         }
         catch (Exception ex)
         {
@@ -132,9 +143,15 @@ public class FieldsController : ControllerBase
     {
         try
         {
-            var deleted = await _fieldService.DeleteAsync(id, cancellationToken);
-            if (!deleted)
-                return NotFound(new { error = $"Field with ID {id} not found" });
+            var result = await _fieldService.DeleteFieldAsync(id, cancellationToken);
+            
+            if (!result.IsSuccess)
+            {
+                if (result.Errors.Any(e => e.Message.Contains("not found")))
+                    return NotFound(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+                
+                return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
+            }
 
             return NoContent();
         }

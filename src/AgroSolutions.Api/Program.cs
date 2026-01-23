@@ -1,5 +1,6 @@
 using AgroSolutions.Api.Services;
 using AgroSolutions.Api.HealthChecks;
+using AgroSolutions.Api.Application.Common.Notifications;
 using AgroSolutions.Domain.Data;
 using AgroSolutions.Domain.Repositories;
 using Microsoft.OpenApi.Models;
@@ -11,6 +12,10 @@ using Serilog;
 using HealthChecks.UI.Client;
 using HealthChecks.UI;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using MediatR;
+using FluentValidation;
+using System.Reflection;
+using AutoMapper;
 
 // Configure Serilog
 // Ensure logs directory exists
@@ -79,6 +84,18 @@ try
             });
         }
     });
+
+    // Register MediatR
+    builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
+    // Register FluentValidation
+    builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+    // Register AutoMapper
+    builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
+    // Register NotificationContext (scoped per request)
+    builder.Services.AddScoped<NotificationContext>();
 
     // Register repositories
     builder.Services.AddScoped<ISensorReadingRepository, SensorReadingRepository>();

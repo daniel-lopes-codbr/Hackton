@@ -1,6 +1,6 @@
-using AgroSolutions.Api.Services;
+using AgroSolutions.Application.Services;
 using AgroSolutions.Api.HealthChecks;
-using AgroSolutions.Api.Application.Common.Notifications;
+using AgroSolutions.Application.Common.Notifications;
 using AgroSolutions.Domain.Data;
 using AgroSolutions.Domain.Repositories;
 using Microsoft.OpenApi.Models;
@@ -85,14 +85,14 @@ try
         }
     });
 
-    // Register MediatR
-    builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+    // Register MediatR (from Application layer)
+    builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AgroSolutions.Application.Services.IUserService).Assembly));
 
-    // Register FluentValidation
-    builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+    // Register FluentValidation (from Application layer)
+    builder.Services.AddValidatorsFromAssembly(typeof(AgroSolutions.Application.Services.IUserService).Assembly);
 
-    // Register AutoMapper
-    builder.Services.AddAutoMapper(typeof(Program).Assembly);
+    // Register AutoMapper (from Application layer)
+    builder.Services.AddAutoMapper(typeof(AgroSolutions.Application.Services.IUserService).Assembly);
 
     // Register NotificationContext (scoped per request)
     builder.Services.AddScoped<NotificationContext>();

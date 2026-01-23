@@ -1,9 +1,11 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.Domain", "src\AgroSolutions.Domain\AgroSolutions.Domain.csproj", "{862B7B69-B92A-46E5-8B11-6A818BB8F8DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.Application", "src\AgroSolutions.Application\AgroSolutions.Application.csproj", "{F1A2B3C4-D5E6-7890-ABCD-EF1234567890}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.Domain.Tests", "tests\AgroSolutions.Domain.Tests\AgroSolutions.Domain.Tests.csproj", "{2E3E44F2-3F5B-4CDB-A056-9DA3C20CF542}"
 EndProject
@@ -28,6 +30,10 @@ Global
 		{862B7B69-B92A-46E5-8B11-6A818BB8F8DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{862B7B69-B92A-46E5-8B11-6A818BB8F8DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{862B7B69-B92A-46E5-8B11-6A818BB8F8DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1A2B3C4-D5E6-7890-ABCD-EF1234567890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1A2B3C4-D5E6-7890-ABCD-EF1234567890}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1A2B3C4-D5E6-7890-ABCD-EF1234567890}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1A2B3C4-D5E6-7890-ABCD-EF1234567890}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2E3E44F2-3F5B-4CDB-A056-9DA3C20CF542}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2E3E44F2-3F5B-4CDB-A056-9DA3C20CF542}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E3E44F2-3F5B-4CDB-A056-9DA3C20CF542}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AgroSolutions.Domain\AgroSolutions.Domain.csproj" />
+    <ProjectReference Include="..\AgroSolutions.Application\AgroSolutions.Application.csproj" />
   </ItemGroup>
 
 </Project>

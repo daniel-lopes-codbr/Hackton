@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-using AgroSolutions.Api.Services;
+using AgroSolutions.Application.Services;
 
 namespace AgroSolutions.Api.HealthChecks;
 

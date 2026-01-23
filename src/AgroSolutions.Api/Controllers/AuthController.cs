@@ -1,5 +1,5 @@
-using AgroSolutions.Api.Models;
-using AgroSolutions.Api.Services;
+using AgroSolutions.Application.Models;
+using AgroSolutions.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AgroSolutions.Api.Controllers;

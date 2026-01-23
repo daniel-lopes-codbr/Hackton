@@ -17,5 +17,4 @@ public interface IFieldRepository
     Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default);
     Task<bool> ExistsByFarmIdAsync(Guid farmId, CancellationToken cancellationToken = default);
     Task<int> CountByFarmIdAsync(Guid farmId, CancellationToken cancellationToken = default);
-    Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -15,17 +15,20 @@ namespace AgroSolutions.Application.Handlers.Commands.Ingestion;
 public class IngestSingleCommandHandler : IRequestHandler<IngestSingleCommand, Result<Models.SensorReadingDto>>
 {
     private readonly ISensorReadingRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ILogger<IngestSingleCommandHandler> _logger;
     private readonly NotificationContext _notificationContext;
 
     public IngestSingleCommandHandler(
         ISensorReadingRepository repository,
+        IUnitOfWork unitOfWork,
         IMapper mapper,
         ILogger<IngestSingleCommandHandler> logger,
         NotificationContext notificationContext)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
         _logger = logger;
         _notificationContext = notificationContext;
@@ -48,7 +51,7 @@ public class IngestSingleCommandHandler : IRequestHandler<IngestSingleCommand, R
 
             // Save
             await _repository.AddAsync(reading, cancellationToken);
-            await _repository.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Map Entity → DTO using AutoMapper
             var readingDto = _mapper.Map<Models.SensorReadingDto>(reading);

@@ -13,15 +13,18 @@ namespace AgroSolutions.Application.Handlers.Commands.Users;
 public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Result>
 {
     private readonly IUserRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<DeleteUserCommandHandler> _logger;
     private readonly NotificationContext _notificationContext;
 
     public DeleteUserCommandHandler(
         IUserRepository repository,
+        IUnitOfWork unitOfWork,
         ILogger<DeleteUserCommandHandler> logger,
         NotificationContext notificationContext)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
         _notificationContext = notificationContext;
     }
@@ -38,7 +41,7 @@ public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Resul
         var deleted = await _repository.DeleteAsync(request.Id, cancellationToken);
         if (deleted)
         {
-            await _repository.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Deleted user {UserId}", request.Id);
             return Result.Success();
         }

@@ -13,15 +13,18 @@ namespace AgroSolutions.Application.Handlers.Commands.Farms;
 public class DeleteFarmCommandHandler : IRequestHandler<DeleteFarmCommand, Result>
 {
     private readonly IFarmRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<DeleteFarmCommandHandler> _logger;
     private readonly NotificationContext _notificationContext;
 
     public DeleteFarmCommandHandler(
         IFarmRepository repository,
+        IUnitOfWork unitOfWork,
         ILogger<DeleteFarmCommandHandler> logger,
         NotificationContext notificationContext)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
         _notificationContext = notificationContext;
     }
@@ -38,7 +41,7 @@ public class DeleteFarmCommandHandler : IRequestHandler<DeleteFarmCommand, Resul
         var deleted = await _repository.DeleteAsync(request.Id, cancellationToken);
         if (deleted)
         {
-            await _repository.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Deleted farm {FarmId}", request.Id);
             return Result.Success();
         }

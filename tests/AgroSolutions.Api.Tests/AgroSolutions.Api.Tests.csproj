@@ -27,6 +27,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\AgroSolutions.Api\AgroSolutions.Api.csproj" />
     <ProjectReference Include="..\..\src\AgroSolutions.Domain\AgroSolutions.Domain.csproj" />
+    <ProjectReference Include="..\..\src\AgroSolutions.Application\AgroSolutions.Application.csproj" />
+    <ProjectReference Include="..\..\src\AgroSolutions.Infrastructure\AgroSolutions.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

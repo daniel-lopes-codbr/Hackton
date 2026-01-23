@@ -16,17 +16,20 @@ namespace AgroSolutions.Application.Handlers.Commands.Farms;
 public class CreateFarmCommandHandler : IRequestHandler<CreateFarmCommand, Result<Models.FarmDto>>
 {
     private readonly IFarmRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ILogger<CreateFarmCommandHandler> _logger;
     private readonly NotificationContext _notificationContext;
 
     public CreateFarmCommandHandler(
         IFarmRepository repository,
+        IUnitOfWork unitOfWork,
         IMapper mapper,
         ILogger<CreateFarmCommandHandler> logger,
         NotificationContext notificationContext)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
         _logger = logger;
         _notificationContext = notificationContext;
@@ -52,7 +55,7 @@ public class CreateFarmCommandHandler : IRequestHandler<CreateFarmCommand, Resul
 
         // Save
         await _repository.AddAsync(farm, cancellationToken);
-        await _repository.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         // Map Entity → DTO using AutoMapper
         var farmDto = _mapper.Map<Models.FarmDto>(farm);

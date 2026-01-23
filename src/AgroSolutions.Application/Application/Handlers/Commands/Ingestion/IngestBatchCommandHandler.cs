@@ -15,17 +15,20 @@ namespace AgroSolutions.Application.Handlers.Commands.Ingestion;
 public class IngestBatchCommandHandler : IRequestHandler<IngestBatchCommand, Result<Models.IngestionResponseDto>>
 {
     private readonly ISensorReadingRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ILogger<IngestBatchCommandHandler> _logger;
     private readonly NotificationContext _notificationContext;
 
     public IngestBatchCommandHandler(
         ISensorReadingRepository repository,
+        IUnitOfWork unitOfWork,
         IMapper mapper,
         ILogger<IngestBatchCommandHandler> logger,
         NotificationContext notificationContext)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
         _logger = logger;
         _notificationContext = notificationContext;
@@ -83,7 +86,7 @@ public class IngestBatchCommandHandler : IRequestHandler<IngestBatchCommand, Res
             try
             {
                 await _repository.AddRangeAsync(readingsToAdd, cancellationToken);
-                await _repository.SaveChangesAsync(cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
                 response.Success = true;
             }
             catch (Exception ex)

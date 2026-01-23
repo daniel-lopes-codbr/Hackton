@@ -11029,7 +11029,9 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "AgroSolutions.Api >= 1.0.0",
+      "AgroSolutions.Application >= 1.0.0",
       "AgroSolutions.Domain >= 1.0.0",
+      "AgroSolutions.Infrastructure >= 1.0.0",
       "Microsoft.AspNetCore.Mvc.Testing >= 8.0.11",
       "Microsoft.EntityFrameworkCore.InMemory >= 8.0.0",
       "Microsoft.NET.Test.Sdk >= 17.8.0",
@@ -11067,8 +11069,14 @@
             "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/AgroSolutions.Api.csproj": {
               "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/AgroSolutions.Api.csproj"
             },
+            "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Application/AgroSolutions.Application.csproj": {
+              "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Application/AgroSolutions.Application.csproj"
+            },
             "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
               "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj"
+            },
+            "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Infrastructure/AgroSolutions.Infrastructure.csproj": {
+              "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Infrastructure/AgroSolutions.Infrastructure.csproj"
             }
           }
         }

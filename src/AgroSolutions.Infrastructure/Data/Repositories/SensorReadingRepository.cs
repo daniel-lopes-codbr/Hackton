@@ -57,9 +57,4 @@ public class SensorReadingRepository : ISensorReadingRepository
         return await _context.SensorReadings
             .CountAsync(r => r.FieldId == fieldId, cancellationToken);
     }
-
-    public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        await _context.SaveChangesAsync(cancellationToken);
-    }
 }

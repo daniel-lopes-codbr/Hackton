@@ -75,9 +75,4 @@ public class UserRepository : IUserRepository
         return await _context.Users
             .CountAsync(cancellationToken);
     }
-
-    public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        await _context.SaveChangesAsync(cancellationToken);
-    }
 }

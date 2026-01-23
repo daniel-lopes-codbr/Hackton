@@ -13,15 +13,18 @@ namespace AgroSolutions.Application.Handlers.Commands.Fields;
 public class DeleteFieldCommandHandler : IRequestHandler<DeleteFieldCommand, Result>
 {
     private readonly IFieldRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<DeleteFieldCommandHandler> _logger;
     private readonly NotificationContext _notificationContext;
 
     public DeleteFieldCommandHandler(
         IFieldRepository repository,
+        IUnitOfWork unitOfWork,
         ILogger<DeleteFieldCommandHandler> logger,
         NotificationContext notificationContext)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
         _notificationContext = notificationContext;
     }
@@ -38,7 +41,7 @@ public class DeleteFieldCommandHandler : IRequestHandler<DeleteFieldCommand, Res
         var deleted = await _repository.DeleteAsync(request.Id, cancellationToken);
         if (deleted)
         {
-            await _repository.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Deleted field {FieldId}", request.Id);
             return Result.Success();
         }

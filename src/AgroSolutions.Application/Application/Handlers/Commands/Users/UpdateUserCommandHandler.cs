@@ -14,17 +14,20 @@ namespace AgroSolutions.Application.Handlers.Commands.Users;
 public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Result<Models.UserDto>>
 {
     private readonly IUserRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ILogger<UpdateUserCommandHandler> _logger;
     private readonly NotificationContext _notificationContext;
 
     public UpdateUserCommandHandler(
         IUserRepository repository,
+        IUnitOfWork unitOfWork,
         IMapper mapper,
         ILogger<UpdateUserCommandHandler> logger,
         NotificationContext notificationContext)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
         _logger = logger;
         _notificationContext = notificationContext;
@@ -67,7 +70,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
 
         // Save changes
         await _repository.UpdateAsync(user, cancellationToken);
-        await _repository.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         // Map Entity → DTO using AutoMapper
         var userDto = _mapper.Map<Models.UserDto>(user);

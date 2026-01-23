@@ -1,9 +1,11 @@
-using AgroSolutions.Api.Models;
-using AgroSolutions.Api.Services;
-using AgroSolutions.Domain.Data;
-using AgroSolutions.Domain.Repositories;
-using Microsoft.EntityFrameworkCore;
+using AgroSolutions.Application.Models;
+using AgroSolutions.Application.Services;
+using AgroSolutions.Application.Commands.Ingestion;
+using AgroSolutions.Application.Common.Results;
 using Microsoft.Extensions.Logging;
+using Moq;
+using AutoMapper;
+using MediatR;
 using Xunit;
 
 namespace AgroSolutions.Api.Tests.Services;
@@ -11,24 +13,20 @@ namespace AgroSolutions.Api.Tests.Services;
 public class IngestionServiceTests
 {
     private readonly IngestionService _service;
+    private readonly Mock<IMediator> _mockMediator;
+    private readonly Mock<IMapper> _mockMapper;
     private readonly ILogger<IngestionService> _logger;
-    private readonly AgroSolutionsDbContext _context;
-    private readonly ISensorReadingRepository _repository;
 
     public IngestionServiceTests()
     {
-        var options = new DbContextOptionsBuilder<AgroSolutionsDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
-        
-        _context = new AgroSolutionsDbContext(options);
-        _repository = new SensorReadingRepository(_context);
+        _mockMediator = new Mock<IMediator>();
+        _mockMapper = new Mock<IMapper>();
         _logger = new LoggerFactory().CreateLogger<IngestionService>();
-        _service = new IngestionService(_logger, _repository);
+        _service = new IngestionService(_mockMediator.Object, _mockMapper.Object, _logger);
     }
 
     [Fact]
-    public async Task IngestSingleAsync_Should_Create_SensorReading()
+    public async Task IngestSingleAsync_Should_Return_Success_Result()
     {
         // Arrange
         var dto = new SensorReadingDto
@@ -40,19 +38,36 @@ public class IngestionServiceTests
             ReadingTimestamp = DateTime.UtcNow
         };
 
+        var expectedDto = new SensorReadingDto
+        {
+            FieldId = dto.FieldId,
+            SensorType = dto.SensorType,
+            Value = dto.Value,
+            Unit = dto.Unit,
+            ReadingTimestamp = dto.ReadingTimestamp
+        };
+
+        var command = new IngestSingleCommand { Reading = dto };
+        var expectedResult = Result<SensorReadingDto>.Success(expectedDto);
+
+        _mockMapper.Setup(m => m.Map<IngestSingleCommand>(dto)).Returns(command);
+        _mockMediator.Setup(m => m.Send(command, It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult(expectedResult));
+
         // Act
         var result = await _service.IngestSingleAsync(dto);
 
         // Assert
         Assert.NotNull(result);
-        Assert.NotEqual(Guid.Empty, result.Id);
-        Assert.Equal(dto.FieldId, result.FieldId);
-        Assert.Equal(dto.SensorType, result.SensorType);
-        Assert.Equal(dto.Value, result.Value);
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+        Assert.Equal(dto.FieldId, result.Value.FieldId);
+        Assert.Equal(dto.SensorType, result.Value.SensorType);
+        Assert.Equal(dto.Value, result.Value.Value);
     }
 
     [Fact]
-    public async Task IngestSingleAsync_Should_Throw_When_FieldId_Is_Empty()
+    public async Task IngestSingleAsync_Should_Return_Failure_When_Validation_Fails()
     {
         // Arrange
         var dto = new SensorReadingDto
@@ -64,8 +79,21 @@ public class IngestionServiceTests
             ReadingTimestamp = DateTime.UtcNow
         };
 
-        // Act & Assert
-        await Assert.ThrowsAsync<AgroSolutions.Domain.Exceptions.DomainException>(() => _service.IngestSingleAsync(dto));
+        var command = new IngestSingleCommand { Reading = dto };
+        var expectedResult = Result<SensorReadingDto>.Failure("FieldId", "Field ID is required");
+
+        _mockMapper.Setup(m => m.Map<IngestSingleCommand>(dto)).Returns(command);
+        _mockMediator.Setup(m => m.Send(command, It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult(expectedResult));
+
+        // Act
+        var result = await _service.IngestSingleAsync(dto);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.False(result.IsSuccess);
+        Assert.NotNull(result.Errors);
+        Assert.NotEmpty(result.Errors);
     }
 
     [Fact]
@@ -82,14 +110,30 @@ public class IngestionServiceTests
             }
         };
 
+        var command = new IngestBatchCommand { Batch = batchDto };
+        var responseDto = new IngestionResponseDto
+        {
+            Success = true,
+            ProcessedCount = 3,
+            FailedCount = 0,
+            ProcessingTime = TimeSpan.FromMilliseconds(100)
+        };
+        var expectedResult = Result<IngestionResponseDto>.Success(responseDto);
+
+        _mockMapper.Setup(m => m.Map<IngestBatchCommand>(batchDto)).Returns(command);
+        _mockMediator.Setup(m => m.Send(command, It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult(expectedResult));
+
         // Act
         var result = await _service.IngestBatchAsync(batchDto);
 
         // Assert
-        Assert.True(result.Success);
-        Assert.Equal(3, result.ProcessedCount);
-        Assert.Equal(0, result.FailedCount);
-        Assert.True(result.ProcessingTime.TotalMilliseconds >= 0);
+        Assert.NotNull(result);
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+        Assert.True(result.Value.Success);
+        Assert.Equal(3, result.Value.ProcessedCount);
+        Assert.Equal(0, result.Value.FailedCount);
     }
 
     [Fact]
@@ -106,15 +150,21 @@ public class IngestionServiceTests
             }
         };
 
+        var command = new IngestBatchCommand { Batch = batchDto };
+        var expectedResult = Result<IngestionResponseDto>.Failure("Validation", "Some readings failed validation");
+
+        _mockMapper.Setup(m => m.Map<IngestBatchCommand>(batchDto)).Returns(command);
+        _mockMediator.Setup(m => m.Send(command, It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult(expectedResult));
+
         // Act
         var result = await _service.IngestBatchAsync(batchDto);
 
         // Assert
-        Assert.False(result.Success);
-        Assert.Equal(2, result.ProcessedCount);
-        Assert.Equal(1, result.FailedCount);
+        Assert.NotNull(result);
+        Assert.False(result.IsSuccess);
         Assert.NotNull(result.Errors);
-        Assert.Single(result.Errors);
+        Assert.NotEmpty(result.Errors);
     }
 
     [Fact]
@@ -133,17 +183,33 @@ public class IngestionServiceTests
             }).ToList()
         };
 
+        var command = new IngestBatchParallelCommand { Batch = batchDto };
+        var responseDto = new IngestionResponseDto
+        {
+            Success = true,
+            ProcessedCount = 10,
+            FailedCount = 0,
+            ProcessingTime = TimeSpan.FromMilliseconds(50)
+        };
+        var expectedResult = Result<IngestionResponseDto>.Success(responseDto);
+
+        _mockMapper.Setup(m => m.Map<IngestBatchParallelCommand>(batchDto)).Returns(command);
+        _mockMediator.Setup(m => m.Send(command, It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult(expectedResult));
+
         // Act
         var result = await _service.IngestBatchParallelAsync(batchDto);
 
         // Assert
-        Assert.True(result.Success);
-        Assert.Equal(10, result.ProcessedCount);
-        Assert.Equal(0, result.FailedCount);
+        Assert.NotNull(result);
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+        Assert.Equal(10, result.Value.ProcessedCount);
+        Assert.Equal(0, result.Value.FailedCount);
     }
 
     [Fact]
-    public async Task IngestBatchParallelAsync_Should_Be_Faster_Than_Sequential()
+    public async Task IngestBatchParallelAsync_Should_Call_MediatR_With_Parallel_Command()
     {
         // Arrange
         var readings = Enumerable.Range(0, 50).Select(i => new SensorReadingDto
@@ -156,30 +222,27 @@ public class IngestionServiceTests
         }).ToList();
 
         var batchDto = new BatchSensorReadingDto { Readings = readings };
+        var command = new IngestBatchParallelCommand { Batch = batchDto };
+        var responseDto = new IngestionResponseDto
+        {
+            Success = true,
+            ProcessedCount = 50,
+            FailedCount = 0,
+            ProcessingTime = TimeSpan.FromMilliseconds(30)
+        };
+        var expectedResult = Result<IngestionResponseDto>.Success(responseDto);
+
+        _mockMapper.Setup(m => m.Map<IngestBatchParallelCommand>(batchDto)).Returns(command);
+        _mockMediator.Setup(m => m.Send(command, It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult(expectedResult));
 
         // Act
-        var sequentialStart = DateTime.UtcNow;
-        var sequentialResult = await _service.IngestBatchAsync(batchDto);
-        var sequentialTime = DateTime.UtcNow - sequentialStart;
-
-        // Create new service instance with new context to avoid state issues
-        var options2 = new DbContextOptionsBuilder<AgroSolutionsDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
-        var context2 = new AgroSolutionsDbContext(options2);
-        var repository2 = new SensorReadingRepository(context2);
-        var service2 = new IngestionService(_logger, repository2);
-        var parallelStart = DateTime.UtcNow;
-        var parallelResult = await service2.IngestBatchParallelAsync(batchDto);
-        var parallelTime = DateTime.UtcNow - parallelStart;
+        var result = await _service.IngestBatchParallelAsync(batchDto);
 
         // Assert
-        Assert.True(sequentialResult.Success);
-        Assert.True(parallelResult.Success);
-        // Note: Parallel might not always be faster for small batches due to overhead,
-        // but it should handle larger batches more efficiently
-        Assert.True(sequentialTime.TotalMilliseconds >= 0);
-        Assert.True(parallelTime.TotalMilliseconds >= 0);
+        Assert.NotNull(result);
+        Assert.True(result.IsSuccess);
+        _mockMediator.Verify(m => m.Send(It.Is<IngestBatchParallelCommand>(c => c.Batch == batchDto), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -187,13 +250,20 @@ public class IngestionServiceTests
     {
         // Arrange
         var batchDto = new BatchSensorReadingDto { Readings = new List<SensorReadingDto>() };
+        var command = new IngestBatchCommand { Batch = batchDto };
+        var expectedResult = Result<IngestionResponseDto>.Failure("Batch", "No readings provided in batch");
+
+        _mockMapper.Setup(m => m.Map<IngestBatchCommand>(batchDto)).Returns(command);
+        _mockMediator.Setup(m => m.Send(command, It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult(expectedResult));
 
         // Act
         var result = await _service.IngestBatchAsync(batchDto);
 
         // Assert
-        Assert.False(result.Success);
+        Assert.NotNull(result);
+        Assert.False(result.IsSuccess);
         Assert.NotNull(result.Errors);
-        Assert.Contains("No readings provided", result.Errors.First());
+        Assert.NotEmpty(result.Errors);
     }
 }

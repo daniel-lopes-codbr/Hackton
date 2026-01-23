@@ -85,9 +85,4 @@ public class FieldRepository : IFieldRepository
         return await _context.Fields
             .CountAsync(f => f.FarmId == farmId, cancellationToken);
     }
-
-    public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        await _context.SaveChangesAsync(cancellationToken);
-    }
 }

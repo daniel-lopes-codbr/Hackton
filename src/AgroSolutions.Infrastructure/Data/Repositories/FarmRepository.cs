@@ -71,9 +71,4 @@ public class FarmRepository : IFarmRepository
         return await _context.Farms
             .CountAsync(cancellationToken);
     }
-
-    public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        await _context.SaveChangesAsync(cancellationToken);
-    }
 }

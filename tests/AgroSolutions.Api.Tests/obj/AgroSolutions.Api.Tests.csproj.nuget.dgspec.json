@@ -420,8 +420,14 @@
               "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/AgroSolutions.Api.csproj": {
                 "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/AgroSolutions.Api.csproj"
               },
+              "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Application/AgroSolutions.Application.csproj": {
+                "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Application/AgroSolutions.Application.csproj"
+              },
               "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj": {
                 "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/AgroSolutions.Domain.csproj"
+              },
+              "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Infrastructure/AgroSolutions.Infrastructure.csproj": {
+                "projectPath": "/Volumes/External/FIAP/Hackton/src/AgroSolutions.Infrastructure/AgroSolutions.Infrastructure.csproj"
               }
             }
           }

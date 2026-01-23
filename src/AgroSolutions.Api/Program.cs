@@ -98,6 +98,9 @@ try
     // Register NotificationContext (scoped per request)
     builder.Services.AddScoped<NotificationContext>();
 
+    // Register Unit of Work
+    builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
     // Register repositories
     builder.Services.AddScoped<ISensorReadingRepository, SensorReadingRepository>();
     builder.Services.AddScoped<IFarmRepository, FarmRepository>();

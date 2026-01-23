@@ -15,17 +15,20 @@ namespace AgroSolutions.Application.Handlers.Commands.Fields;
 public class UpdateFieldCommandHandler : IRequestHandler<UpdateFieldCommand, Result<Models.FieldDto>>
 {
     private readonly IFieldRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ILogger<UpdateFieldCommandHandler> _logger;
     private readonly NotificationContext _notificationContext;
 
     public UpdateFieldCommandHandler(
         IFieldRepository repository,
+        IUnitOfWork unitOfWork,
         IMapper mapper,
         ILogger<UpdateFieldCommandHandler> logger,
         NotificationContext notificationContext)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
         _logger = logger;
         _notificationContext = notificationContext;
@@ -64,7 +67,7 @@ public class UpdateFieldCommandHandler : IRequestHandler<UpdateFieldCommand, Res
 
         // Save changes
         await _repository.UpdateAsync(field, cancellationToken);
-        await _repository.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         // Map Entity → DTO using AutoMapper
         var fieldDto = _mapper.Map<Models.FieldDto>(field);

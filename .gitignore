@@ -408,3 +408,6 @@ Temporary Items
 # Ignore all .md files in root except README.md
 /*.md
 !README.md
+
+# Terminal output files
+6.txt

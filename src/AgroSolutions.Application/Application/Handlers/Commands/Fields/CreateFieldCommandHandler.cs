@@ -16,6 +16,7 @@ public class CreateFieldCommandHandler : IRequestHandler<CreateFieldCommand, Res
 {
     private readonly IFieldRepository _fieldRepository;
     private readonly IFarmRepository _farmRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ILogger<CreateFieldCommandHandler> _logger;
     private readonly NotificationContext _notificationContext;
@@ -23,12 +24,14 @@ public class CreateFieldCommandHandler : IRequestHandler<CreateFieldCommand, Res
     public CreateFieldCommandHandler(
         IFieldRepository fieldRepository,
         IFarmRepository farmRepository,
+        IUnitOfWork unitOfWork,
         IMapper mapper,
         ILogger<CreateFieldCommandHandler> logger,
         NotificationContext notificationContext)
     {
         _fieldRepository = fieldRepository;
         _farmRepository = farmRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
         _logger = logger;
         _notificationContext = notificationContext;
@@ -61,7 +64,7 @@ public class CreateFieldCommandHandler : IRequestHandler<CreateFieldCommand, Res
 
         // Save
         await _fieldRepository.AddAsync(field, cancellationToken);
-        await _fieldRepository.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         // Map Entity → DTO using AutoMapper
         var fieldDto = _mapper.Map<Models.FieldDto>(field);

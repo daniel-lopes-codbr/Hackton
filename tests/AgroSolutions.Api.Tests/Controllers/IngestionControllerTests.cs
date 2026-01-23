@@ -1,6 +1,7 @@
 using AgroSolutions.Api.Controllers;
-using AgroSolutions.Api.Models;
-using AgroSolutions.Api.Services;
+using AgroSolutions.Application.Models;
+using AgroSolutions.Application.Services;
+using AgroSolutions.Application.Common.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -34,22 +35,25 @@ public class IngestionControllerTests
             ReadingTimestamp = DateTime.UtcNow
         };
 
-        var reading = new AgroSolutions.Domain.Entities.SensorReading(
-            dto.FieldId,
-            dto.SensorType,
-            dto.Value,
-            dto.Unit,
-            dto.ReadingTimestamp
-        );
+        var resultDto = new SensorReadingDto
+        {
+            FieldId = dto.FieldId,
+            SensorType = dto.SensorType,
+            Value = dto.Value,
+            Unit = dto.Unit,
+            ReadingTimestamp = dto.ReadingTimestamp
+        };
+
+        var result = Result<SensorReadingDto>.Success(resultDto);
 
         _mockService.Setup(s => s.IngestSingleAsync(It.IsAny<SensorReadingDto>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(reading);
+            .Returns(Task.FromResult(result));
 
         // Act
-        var result = await _controller.IngestSingle(dto);
+        var actionResult = await _controller.IngestSingle(dto);
 
         // Assert
-        var createdResult = Assert.IsType<CreatedAtActionResult>(result);
+        var createdResult = Assert.IsType<CreatedAtActionResult>(actionResult);
         Assert.NotNull(createdResult.Value);
         _mockService.Verify(s => s.IngestSingleAsync(It.IsAny<SensorReadingDto>(), It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -74,14 +78,16 @@ public class IngestionControllerTests
             ProcessingTime = TimeSpan.FromMilliseconds(10)
         };
 
+        var result = Result<IngestionResponseDto>.Success(response);
+
         _mockService.Setup(s => s.IngestBatchAsync(It.IsAny<BatchSensorReadingDto>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(response);
+            .Returns(Task.FromResult(result));
 
         // Act
-        var result = await _controller.IngestBatch(batchDto);
+        var actionResult = await _controller.IngestBatch(batchDto);
 
         // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
+        var okResult = Assert.IsType<OkObjectResult>(actionResult);
         var responseDto = Assert.IsType<IngestionResponseDto>(okResult.Value);
         Assert.True(responseDto.Success);
         Assert.Equal(1, responseDto.ProcessedCount);
@@ -107,14 +113,16 @@ public class IngestionControllerTests
             ProcessingTime = TimeSpan.FromMilliseconds(5)
         };
 
+        var result = Result<IngestionResponseDto>.Success(response);
+
         _mockService.Setup(s => s.IngestBatchParallelAsync(It.IsAny<BatchSensorReadingDto>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(response);
+            .Returns(Task.FromResult(result));
 
         // Act
-        var result = await _controller.IngestBatchParallel(batchDto);
+        var actionResult = await _controller.IngestBatchParallel(batchDto);
 
         // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
+        var okResult = Assert.IsType<OkObjectResult>(actionResult);
         var responseDto = Assert.IsType<IngestionResponseDto>(okResult.Value);
         Assert.True(responseDto.Success);
     }

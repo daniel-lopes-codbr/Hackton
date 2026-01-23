@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.Functions", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.Functions.Tests", "tests\AgroSolutions.Functions.Tests\AgroSolutions.Functions.Tests.csproj", "{B2C3D4E5-F6A7-8901-BCDE-F23456789012}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.IntegrationTests", "tests\AgroSolutions.IntegrationTests\AgroSolutions.IntegrationTests.csproj", "{I9N8T7E6-G5R4-3210-TEST-INTEGRATION123}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,5 +62,9 @@ Global
 		{B2C3D4E5-F6A7-8901-BCDE-F23456789012}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2C3D4E5-F6A7-8901-BCDE-F23456789012}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2C3D4E5-F6A7-8901-BCDE-F23456789012}.Release|Any CPU.Build.0 = Release|Any CPU
+		{I9N8T7E6-G5R4-3210-TEST-INTEGRATION123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{I9N8T7E6-G5R4-3210-TEST-INTEGRATION123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{I9N8T7E6-G5R4-3210-TEST-INTEGRATION123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{I9N8T7E6-G5R4-3210-TEST-INTEGRATION123}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

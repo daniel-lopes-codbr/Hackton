@@ -12,7 +12,6 @@
 /Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/bin/Debug/net8.0/AgroSolutions.Domain.deps.json
 /Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/bin/Debug/net8.0/AgroSolutions.Domain.dll
 /Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/bin/Debug/net8.0/AgroSolutions.Domain.pdb
-/Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/obj/Debug/net8.0/AgroSolutions.Domain.csproj.AssemblyReference.cache
 /Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/obj/Debug/net8.0/AgroSolutions.Domain.GeneratedMSBuildEditorConfig.editorconfig
 /Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/obj/Debug/net8.0/AgroSolutions.Domain.AssemblyInfoInputs.cache
 /Volumes/External/FIAP/Hackton/src/AgroSolutions.Domain/obj/Debug/net8.0/AgroSolutions.Domain.AssemblyInfo.cs

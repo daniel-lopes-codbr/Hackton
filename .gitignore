@@ -403,3 +403,8 @@ Temporary Items
 
 # VS Code
 .vscode/
+
+# Documentation files (keep only README.md)
+# Ignore all .md files in root except README.md
+/*.md
+!README.md

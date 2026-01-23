@@ -1,8 +1,9 @@
-using AgroSolutions.Domain.Data;
 using AgroSolutions.Domain.Entities;
+using AgroSolutions.Domain.Repositories;
+using AgroSolutions.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace AgroSolutions.Domain.Repositories;
+namespace AgroSolutions.Infrastructure.Data.Repositories;
 
 /// <summary>
 /// Repository implementation for User entity

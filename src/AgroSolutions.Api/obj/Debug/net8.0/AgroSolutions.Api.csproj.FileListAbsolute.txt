@@ -206,3 +206,5 @@
 /Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/obj/Debug/net8.0/ref/AgroSolutions.Api.dll
 /Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/bin/Debug/net8.0/AgroSolutions.Application.dll
 /Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/bin/Debug/net8.0/AgroSolutions.Application.pdb
+/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/bin/Debug/net8.0/AgroSolutions.Infrastructure.dll
+/Volumes/External/FIAP/Hackton/src/AgroSolutions.Api/bin/Debug/net8.0/AgroSolutions.Infrastructure.pdb

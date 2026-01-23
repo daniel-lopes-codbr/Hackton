@@ -1,8 +1,9 @@
 using AgroSolutions.Application.Services;
 using AgroSolutions.Api.HealthChecks;
 using AgroSolutions.Application.Common.Notifications;
-using AgroSolutions.Domain.Data;
+using AgroSolutions.Infrastructure.Data;
 using AgroSolutions.Domain.Repositories;
+using AgroSolutions.Infrastructure.Data.Repositories;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

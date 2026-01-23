@@ -1,7 +1,7 @@
 using AgroSolutions.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace AgroSolutions.Domain.Data;
+namespace AgroSolutions.Infrastructure.Data;
 
 /// <summary>
 /// DbContext for AgroSolutions application

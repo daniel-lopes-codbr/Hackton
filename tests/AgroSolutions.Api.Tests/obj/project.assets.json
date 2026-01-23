@@ -3825,6 +3825,7 @@
         "dependencies": {
           "AgroSolutions.Application": "1.0.0",
           "AgroSolutions.Domain": "1.0.0",
+          "AgroSolutions.Infrastructure": "1.0.0",
           "AspNetCore.HealthChecks.UI": "8.0.1",
           "AspNetCore.HealthChecks.UI.Client": "8.0.1",
           "AspNetCore.HealthChecks.UI.InMemory.Storage": "8.0.1",
@@ -3879,16 +3880,27 @@
       "AgroSolutions.Domain/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore": "8.0.0",
-          "Microsoft.EntityFrameworkCore.InMemory": "8.0.0",
-          "Microsoft.EntityFrameworkCore.SqlServer": "8.0.0"
-        },
         "compile": {
           "bin/placeholder/AgroSolutions.Domain.dll": {}
         },
         "runtime": {
           "bin/placeholder/AgroSolutions.Domain.dll": {}
+        }
+      },
+      "AgroSolutions.Infrastructure/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "AgroSolutions.Domain": "1.0.0",
+          "Microsoft.EntityFrameworkCore": "8.0.0",
+          "Microsoft.EntityFrameworkCore.InMemory": "8.0.0",
+          "Microsoft.EntityFrameworkCore.SqlServer": "8.0.0"
+        },
+        "compile": {
+          "bin/placeholder/AgroSolutions.Infrastructure.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/AgroSolutions.Infrastructure.dll": {}
         }
       }
     }
@@ -11007,6 +11019,11 @@
       "type": "project",
       "path": "../../src/AgroSolutions.Domain/AgroSolutions.Domain.csproj",
       "msbuildProject": "../../src/AgroSolutions.Domain/AgroSolutions.Domain.csproj"
+    },
+    "AgroSolutions.Infrastructure/1.0.0": {
+      "type": "project",
+      "path": "../../src/AgroSolutions.Infrastructure/AgroSolutions.Infrastructure.csproj",
+      "msbuildProject": "../../src/AgroSolutions.Infrastructure/AgroSolutions.Infrastructure.csproj"
     }
   },
   "projectFileDependencyGroups": {

@@ -50,15 +50,19 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Create a new user (Admin only)
+    /// Create a new user (Public - no authentication required)
     /// </summary>
     [HttpPost]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateUserDto dto, CancellationToken cancellationToken = default)
     {
         try
         {
+            // Force default role to "User" for public registration
+            dto.Role = "User";
+            
             var result = await _userService.CreateUserAsync(dto, cancellationToken);
             
             if (!result.IsSuccess)

@@ -60,6 +60,32 @@ try
                 Email = "support@agrosolutions.com"
             }
         });
+
+        // Add JWT Bearer authentication to Swagger
+        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below. Example: \"Bearer 12345abcdef\"",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer",
+            BearerFormat = "JWT"
+        });
+
+        c.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
     });
 
     // Configure Database
@@ -228,15 +254,42 @@ try
         options.ApiPath = "/health-ui-api";
     });
 
-    // Ensure database is created (for InMemory or development)
+    // Ensure database is created and seeded (for InMemory or development)
     using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<AgroSolutionsDbContext>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        
         if (app.Environment.IsDevelopment())
         {
             // InMemory database is created automatically
             // For SQL Server, uncomment the line below to apply migrations
             // context.Database.Migrate();
+        }
+        else
+        {
+            // For production, ensure database exists and migrations are applied
+            try
+            {
+                context.Database.EnsureCreated();
+                // Uncomment to apply migrations automatically:
+                // context.Database.Migrate();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred while creating/migrating the database");
+            }
+        }
+
+        // Seed initial admin user if database is empty
+        try
+        {
+            var seeder = new DatabaseSeeder(context, scope.ServiceProvider.GetRequiredService<ILogger<DatabaseSeeder>>());
+            await seeder.SeedAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred while seeding the database");
         }
     }
 

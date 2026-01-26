@@ -22,4 +22,19 @@ public interface IIngestionService
     /// Ingests multiple sensor readings in parallel for maximum performance
     /// </summary>
     Task<Result<IngestionResponseDto>> IngestBatchParallelAsync(BatchSensorReadingDto batchDto, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets a sensor reading by ID
+    /// </summary>
+    Task<SensorReadingDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets all sensor readings for a specific field
+    /// </summary>
+    Task<IEnumerable<SensorReadingDto>> GetByFieldIdAsync(Guid fieldId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets sensor readings for a field filtered by sensor type
+    /// </summary>
+    Task<IEnumerable<SensorReadingDto>> GetByFieldIdAndSensorTypeAsync(Guid fieldId, string sensorType, CancellationToken cancellationToken = default);
 }

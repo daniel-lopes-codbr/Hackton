@@ -5,6 +5,7 @@ namespace AgroSolutions.Application.Models;
 /// </summary>
 public class SensorReadingDto
 {
+    public Guid Id { get; set; }
     public Guid FieldId { get; set; }
     public string SensorType { get; set; } = string.Empty;
     public decimal Value { get; set; }
@@ -12,6 +13,8 @@ public class SensorReadingDto
     public DateTime ReadingTimestamp { get; set; }
     public string? Location { get; set; }
     public Dictionary<string, string>? Metadata { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }
 
 /// <summary>

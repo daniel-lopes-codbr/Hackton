@@ -2,6 +2,7 @@ using AgroSolutions.Application.Commands.Ingestion;
 using Microsoft.Extensions.Logging;
 using AgroSolutions.Application.Common.Results;
 using AgroSolutions.Application.Models;
+using AgroSolutions.Domain.Repositories;
 using AutoMapper;
 using MediatR;
 
@@ -15,15 +16,18 @@ public class IngestionService : IIngestionService
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
     private readonly ILogger<IngestionService> _logger;
+    private readonly ISensorReadingRepository _repository;
 
     public IngestionService(
         IMediator mediator,
         IMapper mapper,
-        ILogger<IngestionService> logger)
+        ILogger<IngestionService> logger,
+        ISensorReadingRepository repository)
     {
         _mediator = mediator;
         _mapper = mapper;
         _logger = logger;
+        _repository = repository;
     }
 
     public async Task<Result<SensorReadingDto>> IngestSingleAsync(SensorReadingDto dto, CancellationToken cancellationToken = default)
@@ -51,5 +55,23 @@ public class IngestionService : IIngestionService
         
         // Send Command via MediatR
         return await _mediator.Send(command, cancellationToken);
+    }
+
+    public async Task<SensorReadingDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var reading = await _repository.GetByIdAsync(id, cancellationToken);
+        return reading == null ? null : _mapper.Map<SensorReadingDto>(reading);
+    }
+
+    public async Task<IEnumerable<SensorReadingDto>> GetByFieldIdAsync(Guid fieldId, CancellationToken cancellationToken = default)
+    {
+        var readings = await _repository.GetByFieldIdAsync(fieldId, cancellationToken);
+        return _mapper.Map<IEnumerable<SensorReadingDto>>(readings);
+    }
+
+    public async Task<IEnumerable<SensorReadingDto>> GetByFieldIdAndSensorTypeAsync(Guid fieldId, string sensorType, CancellationToken cancellationToken = default)
+    {
+        var readings = await _repository.GetByFieldIdAndSensorTypeAsync(fieldId, sensorType, cancellationToken);
+        return _mapper.Map<IEnumerable<SensorReadingDto>>(readings);
     }
 }

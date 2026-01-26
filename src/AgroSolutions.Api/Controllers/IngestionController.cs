@@ -44,7 +44,7 @@ public class IngestionController : ControllerBase
                 if (!result.IsSuccess)
                     return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
                 
-                return CreatedAtAction(nameof(IngestSingle), new { id = result.Value!.FieldId }, result.Value);
+                return CreatedAtAction(nameof(GetById), new { id = result.Value!.Id }, result.Value);
         }
         catch (Exception ex)
         {
@@ -111,6 +111,87 @@ public class IngestionController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error ingesting parallel batch");
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Get a sensor reading by ID (Admin only)
+    /// </summary>
+    /// <param name="id">Sensor reading ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Sensor reading</returns>
+    [HttpGet("{id}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(SensorReadingDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var reading = await _ingestionService.GetByIdAsync(id, cancellationToken);
+            
+            if (reading == null)
+                return NotFound(new { error = $"Sensor reading with ID {id} not found" });
+            
+            return Ok(reading);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving sensor reading {ReadingId}", id);
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Get all sensor readings for a specific field (Admin only)
+    /// </summary>
+    /// <param name="fieldId">Field ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>List of sensor readings</returns>
+    [HttpGet("field/{fieldId}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(IEnumerable<SensorReadingDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetByFieldId(Guid fieldId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var readings = await _ingestionService.GetByFieldIdAsync(fieldId, cancellationToken);
+            return Ok(readings);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving sensor readings for field {FieldId}", fieldId);
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Get sensor readings for a field filtered by sensor type (Admin only)
+    /// </summary>
+    /// <param name="fieldId">Field ID</param>
+    /// <param name="sensorType">Sensor type (e.g., Temperature, Humidity)</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>List of sensor readings</returns>
+    [HttpGet("field/{fieldId}/sensor/{sensorType}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(IEnumerable<SensorReadingDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetByFieldIdAndSensorType(
+        Guid fieldId, 
+        string sensorType, 
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var readings = await _ingestionService.GetByFieldIdAndSensorTypeAsync(fieldId, sensorType, cancellationToken);
+            return Ok(readings);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving sensor readings for field {FieldId} and sensor type {SensorType}", fieldId, sensorType);
             return BadRequest(new { error = ex.Message });
         }
     }

@@ -1,6 +1,7 @@
 using AgroSolutions.Domain.Entities;
 using AgroSolutions.Domain.Repositories;
 using BCrypt.Net;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AgroSolutions.Infrastructure.Data;
@@ -26,8 +27,32 @@ public class DatabaseSeeder
     {
         try
         {
-            // Check if any users exist
-            if (!_context.Users.Any())
+            // Ensure database is ready
+            if (!await _context.Database.CanConnectAsync())
+            {
+                _logger.LogWarning("Cannot connect to database. Skipping seed.");
+                return;
+            }
+
+            // Verify that Users table exists (for SQLite, this ensures table is created)
+            try
+            {
+                // Try to query the table to ensure it exists
+                var testQuery = await _context.Users.FirstOrDefaultAsync();
+                _logger.LogDebug("Users table is accessible");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Users table may not exist. Error: {ErrorMessage}", ex.Message);
+                // If table doesn't exist, try to ensure it's created
+                await _context.Database.EnsureCreatedAsync();
+            }
+
+            // Check if any users exist (using async method)
+            var userCount = await _context.Users.CountAsync();
+            _logger.LogInformation("Current user count in database: {UserCount}", userCount);
+            
+            if (userCount == 0)
             {
                 _logger.LogInformation("No users found. Seeding initial admin user...");
 
@@ -41,19 +66,29 @@ public class DatabaseSeeder
                 );
 
                 _context.Users.Add(adminUser);
-                await _context.SaveChangesAsync();
+                var saved = await _context.SaveChangesAsync();
 
-                _logger.LogInformation("Initial admin user created successfully. Email: admin@agrosolutions.com, Password: Admin123!");
+                if (saved > 0)
+                {
+                    // Verify the user was actually saved
+                    var verifyCount = await _context.Users.CountAsync();
+                    _logger.LogInformation("Initial admin user created successfully. Total users now: {UserCount}. Email: admin@agrosolutions.com, Password: Admin123!", verifyCount);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to save admin user. No changes were saved. SaveChangesAsync returned {SavedCount}", saved);
+                }
             }
             else
             {
-                _logger.LogInformation("Users already exist. Skipping seed.");
+                _logger.LogInformation("Users already exist ({UserCount} users). Skipping seed.", userCount);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error seeding database");
-            throw;
+            _logger.LogError(ex, "Error seeding database: {ErrorMessage}. StackTrace: {StackTrace}", ex.Message, ex.StackTrace);
+            // Don't throw - allow application to continue even if seeding fails
+            // This prevents the entire application from failing to start
         }
     }
 }

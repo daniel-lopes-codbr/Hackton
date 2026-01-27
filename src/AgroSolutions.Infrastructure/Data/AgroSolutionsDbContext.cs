@@ -80,7 +80,7 @@ public class AgroSolutionsDbContext : DbContext
                 .HasConversion(
                     v => v == null ? (string?)null : ConvertDictionaryToJson(v),
                     v => string.IsNullOrEmpty(v) ? null : ConvertJsonToDictionary(v))
-                .HasColumnType("nvarchar(max)");
+                .HasColumnType("TEXT"); // Use TEXT for SQLite compatibility (works with SQL Server too)
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt);
             

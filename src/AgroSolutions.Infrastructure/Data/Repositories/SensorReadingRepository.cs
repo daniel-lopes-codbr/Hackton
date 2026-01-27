@@ -39,6 +39,14 @@ public class SensorReadingRepository : ISensorReadingRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<SensorReading>> GetByTimestampRangeAsync(DateTime startTime, DateTime endTime, CancellationToken cancellationToken = default)
+    {
+        return await _context.SensorReadings
+            .Where(r => r.ReadingTimestamp >= startTime && r.ReadingTimestamp <= endTime)
+            .OrderByDescending(r => r.ReadingTimestamp)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<SensorReading> AddAsync(SensorReading reading, CancellationToken cancellationToken = default)
     {
         await _context.SensorReadings.AddAsync(reading, cancellationToken);

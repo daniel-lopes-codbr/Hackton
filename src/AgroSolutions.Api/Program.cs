@@ -132,6 +132,7 @@ try
     builder.Services.AddScoped<IFarmRepository, FarmRepository>();
     builder.Services.AddScoped<IFieldRepository, FieldRepository>();
     builder.Services.AddScoped<IUserRepository, UserRepository>();
+    builder.Services.AddScoped<IAlertRepository, AlertRepository>();
 
     // Register services
     builder.Services.AddScoped<IIngestionService, IngestionService>();
@@ -139,6 +140,7 @@ try
     builder.Services.AddScoped<IFieldService, FieldService>();
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<IAuthService, AuthService>();
+    builder.Services.AddScoped<IAlertService, AlertService>();
 
     // Configure JWT Authentication
     var jwtSettings = builder.Configuration.GetSection("JwtSettings");

@@ -17,6 +17,7 @@ public class AgroSolutionsDbContext : DbContext
     public DbSet<Field> Fields { get; set; }
     public DbSet<SensorReading> SensorReadings { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Alert> Alerts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -103,6 +104,28 @@ public class AgroSolutionsDbContext : DbContext
             
             entity.HasIndex(e => e.Email).IsUnique();
             entity.HasIndex(e => e.Role);
+        });
+
+        // Configure Alert
+        modelBuilder.Entity<Alert>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.FieldId).IsRequired();
+            entity.Property(e => e.FarmId).IsRequired();
+            entity.Property(e => e.Status).IsRequired().HasConversion<int>();
+            entity.Property(e => e.Message).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt);
+            
+            entity.HasIndex(e => e.FieldId);
+            entity.HasIndex(e => e.FarmId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsActive);
+            entity.HasIndex(e => e.CreatedAt);
+            entity.HasIndex(e => new { e.FieldId, e.IsActive });
+            entity.HasIndex(e => new { e.FarmId, e.IsActive });
         });
     }
 

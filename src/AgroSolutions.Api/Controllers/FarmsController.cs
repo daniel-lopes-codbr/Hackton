@@ -57,7 +57,7 @@ public class FarmsController : ControllerBase
     /// Create a new farm (Admin only)
     /// </summary>
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "User,Admin")]
     [ProducesResponseType(typeof(FarmDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -66,10 +66,10 @@ public class FarmsController : ControllerBase
         try
         {
             var result = await _farmService.CreateFarmAsync(dto, cancellationToken);
-            
+
             if (!result.IsSuccess)
                 return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
-            
+
             return CreatedAtAction(nameof(GetById), new { id = result.Value!.Id }, result.Value);
         }
         catch (Exception ex)
@@ -83,7 +83,7 @@ public class FarmsController : ControllerBase
     /// Update an existing farm (Admin only)
     /// </summary>
     [HttpPut("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "User,Admin")]
     [ProducesResponseType(typeof(FarmDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -93,12 +93,12 @@ public class FarmsController : ControllerBase
         try
         {
             var result = await _farmService.UpdateFarmAsync(id, dto, cancellationToken);
-            
+
             if (!result.IsSuccess)
             {
                 if (result.Errors.Any(e => e.Message.Contains("not found")))
                     return NotFound(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
-                
+
                 return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
             }
 
@@ -115,7 +115,7 @@ public class FarmsController : ControllerBase
     /// Delete a farm (Admin only)
     /// </summary>
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "User,Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -125,12 +125,12 @@ public class FarmsController : ControllerBase
         try
         {
             var result = await _farmService.DeleteFarmAsync(id, cancellationToken);
-            
+
             if (!result.IsSuccess)
             {
                 if (result.Errors.Any(e => e.Message.Contains("not found")))
                     return NotFound(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
-                
+
                 return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
             }
 

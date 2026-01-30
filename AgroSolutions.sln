@@ -1,33 +1,29 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.Domain", "src\AgroSolutions.Domain\AgroSolutions.Domain.csproj", "{862B7B69-B92A-46E5-8B11-6A818BB8F8DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgroSolutions.Domain", "src\AgroSolutions.Domain\AgroSolutions.Domain.csproj", "{862B7B69-B92A-46E5-8B11-6A818BB8F8DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.Application", "src\AgroSolutions.Application\AgroSolutions.Application.csproj", "{F1A2B3C4-D5E6-7890-ABCD-EF1234567890}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgroSolutions.Application", "src\AgroSolutions.Application\AgroSolutions.Application.csproj", "{F1A2B3C4-D5E6-7890-ABCD-EF1234567890}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.Infrastructure", "src\AgroSolutions.Infrastructure\AgroSolutions.Infrastructure.csproj", "{I1N2F3R4-A5S6-7890-TRUC-TURE123456789}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgroSolutions.Infrastructure", "src\AgroSolutions.Infrastructure\AgroSolutions.Infrastructure.csproj", "{D6D8C3C2-8F8A-4709-ADAC-F5E4CF7EDB41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.Domain.Tests", "tests\AgroSolutions.Domain.Tests\AgroSolutions.Domain.Tests.csproj", "{2E3E44F2-3F5B-4CDB-A056-9DA3C20CF542}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgroSolutions.Domain.Tests", "tests\AgroSolutions.Domain.Tests\AgroSolutions.Domain.Tests.csproj", "{2E3E44F2-3F5B-4CDB-A056-9DA3C20CF542}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.Api", "src\AgroSolutions.Api\AgroSolutions.Api.csproj", "{356EA60D-FD05-43DD-9CF0-B40F50501D81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgroSolutions.Api", "src\AgroSolutions.Api\AgroSolutions.Api.csproj", "{356EA60D-FD05-43DD-9CF0-B40F50501D81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.Api.Tests", "tests\AgroSolutions.Api.Tests\AgroSolutions.Api.Tests.csproj", "{391DF7D8-F490-4409-BA3B-069371E0D7CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgroSolutions.Api.Tests", "tests\AgroSolutions.Api.Tests\AgroSolutions.Api.Tests.csproj", "{391DF7D8-F490-4409-BA3B-069371E0D7CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.Functions", "src\AgroSolutions.Functions\AgroSolutions.Functions.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgroSolutions.Functions", "src\AgroSolutions.Functions\AgroSolutions.Functions.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.Functions.Tests", "tests\AgroSolutions.Functions.Tests\AgroSolutions.Functions.Tests.csproj", "{B2C3D4E5-F6A7-8901-BCDE-F23456789012}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgroSolutions.Functions.Tests", "tests\AgroSolutions.Functions.Tests\AgroSolutions.Functions.Tests.csproj", "{B2C3D4E5-F6A7-8901-BCDE-F23456789012}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroSolutions.IntegrationTests", "tests\AgroSolutions.IntegrationTests\AgroSolutions.IntegrationTests.csproj", "{I9N8T7E6-G5R4-3210-TEST-INTEGRATION123}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgroSolutions.IntegrationTests", "tests\AgroSolutions.IntegrationTests\AgroSolutions.IntegrationTests.csproj", "{2208E203-EB39-49E1-ADDD-B859F42EE726}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{862B7B69-B92A-46E5-8B11-6A818BB8F8DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -38,10 +34,10 @@ Global
 		{F1A2B3C4-D5E6-7890-ABCD-EF1234567890}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1A2B3C4-D5E6-7890-ABCD-EF1234567890}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1A2B3C4-D5E6-7890-ABCD-EF1234567890}.Release|Any CPU.Build.0 = Release|Any CPU
-		{I1N2F3R4-A5S6-7890-TRUC-TURE123456789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{I1N2F3R4-A5S6-7890-TRUC-TURE123456789}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{I1N2F3R4-A5S6-7890-TRUC-TURE123456789}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{I1N2F3R4-A5S6-7890-TRUC-TURE123456789}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6D8C3C2-8F8A-4709-ADAC-F5E4CF7EDB41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6D8C3C2-8F8A-4709-ADAC-F5E4CF7EDB41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6D8C3C2-8F8A-4709-ADAC-F5E4CF7EDB41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6D8C3C2-8F8A-4709-ADAC-F5E4CF7EDB41}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2E3E44F2-3F5B-4CDB-A056-9DA3C20CF542}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2E3E44F2-3F5B-4CDB-A056-9DA3C20CF542}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E3E44F2-3F5B-4CDB-A056-9DA3C20CF542}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -62,9 +58,12 @@ Global
 		{B2C3D4E5-F6A7-8901-BCDE-F23456789012}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2C3D4E5-F6A7-8901-BCDE-F23456789012}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2C3D4E5-F6A7-8901-BCDE-F23456789012}.Release|Any CPU.Build.0 = Release|Any CPU
-		{I9N8T7E6-G5R4-3210-TEST-INTEGRATION123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{I9N8T7E6-G5R4-3210-TEST-INTEGRATION123}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{I9N8T7E6-G5R4-3210-TEST-INTEGRATION123}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{I9N8T7E6-G5R4-3210-TEST-INTEGRATION123}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2208E203-EB39-49E1-ADDD-B859F42EE726}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2208E203-EB39-49E1-ADDD-B859F42EE726}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2208E203-EB39-49E1-ADDD-B859F42EE726}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2208E203-EB39-49E1-ADDD-B859F42EE726}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

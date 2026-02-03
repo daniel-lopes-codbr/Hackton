@@ -1,0 +1,28 @@
+name: CI - FCG_MS_User
+
+on:
+  pull_request:
+    branches: [ ci_cd ]
+
+jobs:
+  build-and-test:
+    name: Build e Testes Automatizados
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v4
+
+    - name: Setup do .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restaurar pacotes
+      run: dotnet restore FCG_MS_User.sln
+
+    - name: Buildar solução
+      run: dotnet build AgroSolutions.sln --no-restore --configuration Release
+
+    - name: Rodar testes
+      run: dotnet test AgroSolutions.sln --no-build --configuration Release --logger "trx"

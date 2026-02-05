@@ -1,32 +1,35 @@
 # Migrations - Entity Framework Core
 
-## Criar Migration
+## Criar a migration inicial (do zero)
 
-Para criar uma nova migration:
+Na **raiz da solução** (pasta `Hackton`):
 
 ```bash
-cd src/AgroSolutions.Api
-dotnet ef migrations add InitialCreate --context AgroSolutionsDbContext
+dotnet ef migrations add InitialCreate --context AgroSolutionsDbContext --project src/AgroSolutions.Api --startup-project src/AgroSolutions.Api
 ```
 
-## Aplicar Migrations
+No **PowerShell (Windows)**:
 
-Para aplicar as migrations ao banco de dados:
+```powershell
+dotnet ef migrations add InitialCreate --context AgroSolutionsDbContext --project src\AgroSolutions.Api --startup-project src\AgroSolutions.Api
+```
 
-```bash
+## Aplicar as migrations no banco
+
+```powershell
+dotnet ef database update --context AgroSolutionsDbContext --project src\AgroSolutions.Api --startup-project src\AgroSolutions.Api
+```
+
+## Ou: rodar de dentro da pasta da API
+
+```powershell
+cd src\AgroSolutions.Api
+dotnet ef migrations add InitialCreate --context AgroSolutionsDbContext
 dotnet ef database update --context AgroSolutionsDbContext
 ```
 
-## Remover Última Migration
+## Remover a última migration
 
-Se precisar remover a última migration:
-
-```bash
-dotnet ef migrations remove --context AgroSolutionsDbContext
+```powershell
+dotnet ef migrations remove --context AgroSolutionsDbContext --project src\AgroSolutions.Api --startup-project src\AgroSolutions.Api
 ```
-
-## Nota
-
-- Em desenvolvimento, o projeto usa InMemoryDatabase
-- Para produção, configure a connection string em `appsettings.json`
-- As migrations serão aplicadas automaticamente na primeira execução (se configurado)

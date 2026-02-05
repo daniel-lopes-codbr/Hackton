@@ -65,6 +65,9 @@ public class UpdateFarmCommandHandler : IRequestHandler<UpdateFarmCommand, Resul
             );
         }
 
+        // Update UserId when provided (permite associar ou desassociar a fazenda do usuário)
+        farm.SetUserId(request.UserId);
+
         // Save changes
         await _repository.UpdateAsync(farm, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

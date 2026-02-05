@@ -6,6 +6,7 @@ namespace AgroSolutions.Application.Models;
 public class FarmDto
 {
     public Guid Id { get; set; }
+    public Guid? UserId { get; set; }
     public PropertyDto Property { get; set; } = null!;
     public string OwnerName { get; set; } = string.Empty;
     public string? OwnerEmail { get; set; }
@@ -19,6 +20,7 @@ public class FarmDto
 /// </summary>
 public class CreateFarmDto
 {
+    public Guid? UserId { get; set; }
     public PropertyDto Property { get; set; } = null!;
     public string OwnerName { get; set; } = string.Empty;
     public string? OwnerEmail { get; set; }
@@ -30,6 +32,7 @@ public class CreateFarmDto
 /// </summary>
 public class UpdateFarmDto
 {
+    public Guid? UserId { get; set; }
     public PropertyDto? Property { get; set; }
     public string? OwnerName { get; set; }
     public string? OwnerEmail { get; set; }

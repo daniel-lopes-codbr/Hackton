@@ -38,6 +38,12 @@ public class FarmService : IFarmService
         return await _mediator.Send(query, cancellationToken);
     }
 
+    public async Task<IEnumerable<FarmDto>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var query = new GetFarmsByUserIdQuery { UserId = userId };
+        return await _mediator.Send(query, cancellationToken);
+    }
+
     public async Task<FarmDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         // Use Query via MediatR

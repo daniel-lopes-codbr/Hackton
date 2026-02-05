@@ -45,12 +45,13 @@ public class CreateFarmCommandHandler : IRequestHandler<CreateFarmCommand, Resul
             request.Property.Description
         );
 
-        // Create Entity
+        // Create Entity (UserId opcional: associa a fazenda ao usuário)
         var farm = new Farm(
             property,
             request.OwnerName,
             request.OwnerEmail,
-            request.OwnerPhone
+            request.OwnerPhone,
+            request.UserId
         );
 
         // Save

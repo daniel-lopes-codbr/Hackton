@@ -22,7 +22,7 @@ public class FarmTests
         Assert.Equal(ownerName, farm.OwnerName);
         Assert.Null(farm.OwnerEmail);
         Assert.Null(farm.OwnerPhone);
-        Assert.NotNull(farm.CreatedAt);
+        Assert.NotEqual(default(DateTime), farm.CreatedAt);
     }
 
     [Fact]
@@ -41,6 +41,20 @@ public class FarmTests
         Assert.Equal(ownerName, farm.OwnerName);
         Assert.Equal(ownerEmail, farm.OwnerEmail);
         Assert.Equal(ownerPhone, farm.OwnerPhone);
+    }
+
+    [Fact]
+    public void Farm_Should_Create_With_UserId()
+    {
+        // Arrange
+        var property = new Property("Fazenda", "Location", 100m);
+        var userId = Guid.NewGuid();
+
+        // Act
+        var farm = new Farm(property, "Owner", null, null, userId);
+
+        // Assert
+        Assert.Equal(userId, farm.UserId);
     }
 
     [Fact]
@@ -86,7 +100,7 @@ public class FarmTests
         // Assert
         Assert.Equal(property2, farm.Property);
         Assert.NotNull(farm.UpdatedAt);
-        Assert.True(farm.UpdatedAt > farm.CreatedAt);
+        Assert.True(farm.UpdatedAt!.Value > farm.CreatedAt);
     }
 
     [Fact]
@@ -117,7 +131,7 @@ public class FarmTests
         Assert.Equal("maria@example.com", farm.OwnerEmail);
         Assert.Equal("+55 11 88888-8888", farm.OwnerPhone);
         Assert.NotNull(farm.UpdatedAt);
-        Assert.True(farm.UpdatedAt > farm.CreatedAt);
+        Assert.True(farm.UpdatedAt!.Value > farm.CreatedAt);
     }
 
     [Fact]

@@ -8,19 +8,21 @@ namespace AgroSolutions.Domain.Entities;
 public class Farm : Entity
 {
     public Property Property { get; private set; }
+    public Guid? UserId { get; private set; }
     public string OwnerName { get; private set; }
     public string? OwnerEmail { get; private set; }
     public string? OwnerPhone { get; private set; }
 
     private Farm() { } // For EF Core
 
-    public Farm(Property property, string ownerName, string? ownerEmail = null, string? ownerPhone = null)
+    public Farm(Property property, string ownerName, string? ownerEmail = null, string? ownerPhone = null, Guid? userId = null)
         : base()
     {
         if (string.IsNullOrWhiteSpace(ownerName))
             throw new ArgumentException("Owner name cannot be null or empty", nameof(ownerName));
 
         Property = property ?? throw new ArgumentNullException(nameof(property));
+        UserId = userId;
         OwnerName = ownerName;
         OwnerEmail = ownerEmail;
         OwnerPhone = ownerPhone;
@@ -40,6 +42,12 @@ public class Farm : Entity
         OwnerName = ownerName;
         OwnerEmail = ownerEmail;
         OwnerPhone = ownerPhone;
+        MarkAsUpdated();
+    }
+
+    public void SetUserId(Guid? userId)
+    {
+        UserId = userId;
         MarkAsUpdated();
     }
 }

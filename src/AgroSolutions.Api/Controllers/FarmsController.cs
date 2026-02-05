@@ -2,6 +2,7 @@ using AgroSolutions.Application.Models;
 using AgroSolutions.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AgroSolutions.Api.Controllers;
 
@@ -33,6 +34,19 @@ public class FarmsController : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
     {
         var farms = await _farmService.GetAllAsync(cancellationToken);
+        return Ok(farms);
+    }
+
+    /// <summary>
+    /// Get all farms for a specific user (User or Admin)
+    /// </summary>
+    [HttpGet("user/{userId:guid}")]
+    [Authorize(Roles = "User,Admin")]
+    [ProducesResponseType(typeof(IEnumerable<FarmDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetByUserId(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var farms = await _farmService.GetByUserIdAsync(userId, cancellationToken);
         return Ok(farms);
     }
 
@@ -71,6 +85,16 @@ public class FarmsController : ControllerBase
                 return BadRequest(new { errors = result.Errors.Select(e => new { key = e.Key, message = e.Message }) });
 
             return CreatedAtAction(nameof(GetById), new { id = result.Value!.Id }, result.Value);
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError(ex, "Error creating farm - database update failed");
+            var innerMessage = ex.InnerException?.Message ?? ex.Message;
+            return BadRequest(new
+            {
+                error = "Erro ao salvar a fazenda. Se o banco foi criado antes de adicionar a coluna UserId, exclua o arquivo AgroSolutions.db (ou rode 'dotnet ef database update') e reinicie a API.",
+                detail = innerMessage
+            });
         }
         catch (Exception ex)
         {

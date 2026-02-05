@@ -24,7 +24,7 @@ public class FieldTests
         Assert.Equal(cropType, field.CropType);
         Assert.Null(field.PlantingDate);
         Assert.Null(field.HarvestDate);
-        Assert.NotNull(field.CreatedAt);
+        Assert.NotEqual(default(DateTime), field.CreatedAt);
     }
 
     [Fact]

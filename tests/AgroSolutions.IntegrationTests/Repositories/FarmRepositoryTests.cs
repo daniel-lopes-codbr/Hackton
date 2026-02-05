@@ -18,6 +18,7 @@ public class FarmRepositoryTests : IntegrationTestBase
 
     public FarmRepositoryTests()
     {
+        Context.Database.EnsureCreated();
         _repository = new FarmRepository(Context);
     }
 
@@ -128,5 +129,31 @@ public class FarmRepositoryTests : IntegrationTestBase
         // Assert
         var deletedFarm = await _repository.GetByIdAsync(farm.Id);
         deletedFarm.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetByUserIdAsync_Should_Return_Only_Farms_For_That_User()
+    {
+        // Arrange: create a user first (FK from Farm to User)
+        var user = new User("Test User", "user@test.com", "hash", "Admin");
+        Context.Set<User>().Add(user);
+        await Context.SaveChangesAsync();
+
+        var property1 = new Property("Farm User 1", "Location 1", 100m);
+        var property2 = new Property("Farm Other", "Location 2", 200m);
+        var farmForUser = new Farm(property1, "Owner 1", null, null, user.Id);
+        var farmNoUser = new Farm(property2, "Owner 2"); // UserId = null
+
+        await _repository.AddAsync(farmForUser);
+        await _repository.AddAsync(farmNoUser);
+        await Context.SaveChangesAsync();
+
+        // Act
+        var result = await _repository.GetByUserIdAsync(user.Id);
+
+        // Assert
+        result.Should().HaveCount(1);
+        result.Should().Contain(f => f.Id == farmForUser.Id && f.Property.Name == "Farm User 1");
+        result.Should().NotContain(f => f.Id == farmNoUser.Id);
     }
 }

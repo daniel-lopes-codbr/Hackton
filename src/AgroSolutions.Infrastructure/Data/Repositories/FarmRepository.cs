@@ -30,6 +30,14 @@ public class FarmRepository : IFarmRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<Farm>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Farms
+            .Where(f => f.UserId == userId)
+            .OrderBy(f => f.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<Farm>> GetByOwnerNameAsync(string ownerName, CancellationToken cancellationToken = default)
     {
         return await _context.Farms

@@ -35,10 +35,17 @@ public class AgroSolutionsDbContext : DbContext
                 property.Property(p => p.Area).IsRequired().HasPrecision(18, 2);
                 property.Property(p => p.Description).HasMaxLength(1000);
             });
+            entity.Property(e => e.UserId);
             entity.Property(e => e.OwnerName).IsRequired().HasMaxLength(200);
             entity.Property(e => e.OwnerEmail).HasMaxLength(200);
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt);
+            entity.HasIndex(e => e.UserId);
+            entity.HasOne<User>()
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         // Configure Field

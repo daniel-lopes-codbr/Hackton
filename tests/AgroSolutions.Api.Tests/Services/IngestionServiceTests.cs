@@ -2,6 +2,7 @@ using AgroSolutions.Application.Models;
 using AgroSolutions.Application.Services;
 using AgroSolutions.Application.Commands.Ingestion;
 using AgroSolutions.Application.Common.Results;
+using AgroSolutions.Domain.Repositories;
 using Microsoft.Extensions.Logging;
 using Moq;
 using AutoMapper;
@@ -15,14 +16,16 @@ public class IngestionServiceTests
     private readonly IngestionService _service;
     private readonly Mock<IMediator> _mockMediator;
     private readonly Mock<IMapper> _mockMapper;
+    private readonly Mock<ISensorReadingRepository> _mockRepository;
     private readonly ILogger<IngestionService> _logger;
 
     public IngestionServiceTests()
     {
         _mockMediator = new Mock<IMediator>();
         _mockMapper = new Mock<IMapper>();
+        _mockRepository = new Mock<ISensorReadingRepository>();
         _logger = new LoggerFactory().CreateLogger<IngestionService>();
-        _service = new IngestionService(_mockMediator.Object, _mockMapper.Object, _logger);
+        _service = new IngestionService(_mockMediator.Object, _mockMapper.Object, _logger, _mockRepository.Object);
     }
 
     [Fact]

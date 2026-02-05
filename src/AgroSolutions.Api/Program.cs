@@ -106,13 +106,13 @@ try
             }
             else if (connectionString.Contains("Data Source=") || connectionString.EndsWith(".db"))
             {
-                // SQLite database file
-                options.UseSqlite(connectionString);
+                // SQLite database file (MigrationsAssembly so "dotnet ef" creates migrations in Api project)
+                options.UseSqlite(connectionString, b => b.MigrationsAssembly("AgroSolutions.Api"));
             }
             else
             {
                 // Fallback to SQLite if connection string is not recognized
-                options.UseSqlite("Data Source=AgroSolutions.db");
+                options.UseSqlite("Data Source=AgroSolutions.db", b => b.MigrationsAssembly("AgroSolutions.Api"));
             }
         }
         else
@@ -192,10 +192,10 @@ try
         options.AddPolicy("UserOrAdmin", policy => policy.RequireRole("User", "Admin"));
     });
 
-    // Add Health Checks
+    // Add Health Checks (general = API + database; ingestion = ingestion service)
     builder.Services.AddHealthChecks()
-        .AddCheck("self", () => HealthCheckResult.Healthy("API is healthy"))
-        .AddCheck<IngestionHealthCheck>("ingestion_service");
+        .AddCheck<GeneralHealthCheck>("general", failureStatus: HealthStatus.Unhealthy, tags: new[] { "ready" })
+        .AddCheck<IngestionHealthCheck>("ingestion_service", failureStatus: HealthStatus.Degraded, tags: new[] { "ready" });
 
     // Add Health Checks UI
     builder.Services.AddHealthChecksUI(setup =>
@@ -373,6 +373,34 @@ try
                             logger.LogError("Failed to create database after {MaxRetries} attempts", maxRetries);
                             throw; // Re-throw if all retries failed
                         }
+                    }
+                }
+                
+                // Se o banco já existia antes de adicionar a coluna UserId (SQLite), adiciona a coluna agora
+                if (connectionString.Contains("Data Source=") && !connectionString.Contains(":memory:"))
+                {
+                    try
+                    {
+                        await context.Database.ExecuteSqlRawAsync(
+                            "ALTER TABLE Farms ADD COLUMN UserId TEXT NULL;");
+                        logger.LogInformation("✓ Coluna UserId adicionada à tabela Farms");
+                    }
+                    catch (Microsoft.Data.Sqlite.SqliteException ex) when (ex.SqliteErrorCode == 1 && ex.Message.Contains("duplicate column name"))
+                    {
+                        // Coluna já existe, ignora
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogDebug(ex, "ALTER TABLE Farms (UserId) skipped or failed");
+                    }
+                    try
+                    {
+                        await context.Database.ExecuteSqlRawAsync(
+                            "CREATE INDEX IF NOT EXISTS IX_Farms_UserId ON Farms(UserId);");
+                    }
+                    catch (Exception)
+                    {
+                        // Índice pode já existir
                     }
                 }
                 

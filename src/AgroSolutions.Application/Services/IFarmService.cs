@@ -9,6 +9,7 @@ namespace AgroSolutions.Application.Services;
 public interface IFarmService
 {
     Task<IEnumerable<FarmDto>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<FarmDto>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<FarmDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Result<FarmDto>> CreateFarmAsync(CreateFarmDto dto, CancellationToken cancellationToken = default);
     Task<Result<FarmDto>> UpdateFarmAsync(Guid id, UpdateFarmDto dto, CancellationToken cancellationToken = default);

@@ -43,30 +43,34 @@ public class UpdateFarmCommandHandler : IRequestHandler<UpdateFarmCommand, Resul
             return Result<Models.FarmDto>.Failure(_notificationContext.Notifications);
         }
 
-        // Update property if provided
-        if (request.Property != null)
+        // Update name if provided
+        if (!string.IsNullOrWhiteSpace(request.Name))
         {
-            var property = new Property(
-                request.Property.Name,
-                request.Property.Location,
-                request.Property.Area,
-                request.Property.Description
-            );
-            farm.UpdateProperty(property);
+            farm.UpdateName(request.Name);
         }
 
-        // Update owner info if provided
-        if (!string.IsNullOrWhiteSpace(request.OwnerName))
+        // Update dimensions if provided
+        if (request.WidthMeters.HasValue && request.LengthMeters.HasValue)
         {
-            farm.UpdateOwnerInfo(
-                request.OwnerName,
-                request.OwnerEmail,
-                request.OwnerPhone
-            );
+            farm.UpdateDimensions(request.WidthMeters.Value, request.LengthMeters.Value);
+        }
+        else
+        {
+            if (request.WidthMeters.HasValue)
+                farm.UpdateDimensions(request.WidthMeters.Value, farm.LengthMeters);
+            if (request.LengthMeters.HasValue)
+                farm.UpdateDimensions(farm.WidthMeters, request.LengthMeters.Value);
+        }
+
+        // Update precipitation if provided
+        if (request.Precipitation.HasValue)
+        {
+            farm.SetPrecipitation(request.Precipitation);
         }
 
         // Update UserId when provided (permite associar ou desassociar a fazenda do usuário)
-        farm.SetUserId(request.UserId);
+        if (request.UserId != null)
+            farm.SetUserId(request.UserId);
 
         // Save changes
         await _repository.UpdateAsync(farm, cancellationToken);

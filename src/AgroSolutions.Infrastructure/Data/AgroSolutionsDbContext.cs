@@ -17,6 +17,7 @@ public class AgroSolutionsDbContext : DbContext
     public DbSet<Field> Fields { get; set; }
     public DbSet<SensorReading> SensorReadings { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<UserAuthorization> UserAuthorizations { get; set; }
     public DbSet<Alert> Alerts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -28,16 +29,12 @@ public class AgroSolutionsDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedNever(); // We generate GUIDs ourselves
-            entity.OwnsOne(e => e.Property, property =>
-            {
-                property.Property(p => p.Name).IsRequired().HasMaxLength(200);
-                property.Property(p => p.Location).IsRequired().HasMaxLength(500);
-                property.Property(p => p.Area).IsRequired().HasPrecision(18, 2);
-                property.Property(p => p.Description).HasMaxLength(1000);
-            });
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
             entity.Property(e => e.UserId);
-            entity.Property(e => e.OwnerName).IsRequired().HasMaxLength(200);
-            entity.Property(e => e.OwnerEmail).HasMaxLength(200);
+            entity.Property(e => e.WidthMeters).IsRequired().HasPrecision(18, 2);
+            entity.Property(e => e.LengthMeters).IsRequired().HasPrecision(18, 2);
+            entity.Property(e => e.TotalAreaSquareMeters).IsRequired().HasPrecision(18, 2);
+            entity.Property(e => e.Precipitation).HasPrecision(18, 2);
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt);
             entity.HasIndex(e => e.UserId);
@@ -46,6 +43,14 @@ public class AgroSolutionsDbContext : DbContext
                 .HasForeignKey(e => e.UserId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
+            // Owned legacy Property value object (kept for backward compatibility)
+            entity.OwnsOne(e => e.Property, property =>
+            {
+                property.Property(p => p.Name).HasMaxLength(200);
+                property.Property(p => p.Location).HasMaxLength(500);
+                property.Property(p => p.Area).HasPrecision(18, 2);
+                property.Property(p => p.Description).HasMaxLength(1000);
+            });
         });
 
         // Configure Field
@@ -53,14 +58,9 @@ public class AgroSolutionsDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.OwnsOne(e => e.Property, property =>
-            {
-                property.Property(p => p.Name).IsRequired().HasMaxLength(200);
-                property.Property(p => p.Location).IsRequired().HasMaxLength(500);
-                property.Property(p => p.Area).IsRequired().HasPrecision(18, 2);
-                property.Property(p => p.Description).HasMaxLength(1000);
-            });
             entity.Property(e => e.FarmId).IsRequired();
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.AreaSquareMeters).IsRequired().HasPrecision(18, 2);
             entity.Property(e => e.CropType).IsRequired().HasMaxLength(100);
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt);
@@ -70,31 +70,47 @@ public class AgroSolutionsDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.FarmId)
                 .OnDelete(DeleteBehavior.Restrict);
+            // Owned legacy Property value object (kept for backward compatibility)
+            entity.OwnsOne(e => e.Property, property =>
+            {
+                property.Property(p => p.Name).HasMaxLength(200);
+                property.Property(p => p.Location).HasMaxLength(500);
+                property.Property(p => p.Area).HasPrecision(18, 2);
+                property.Property(p => p.Description).HasMaxLength(1000);
+            });
         });
 
-        // Configure SensorReading
+        // Configure SensorReading (supports both single-sensor and aggregated telemetry)
         modelBuilder.Entity<SensorReading>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.FieldId).IsRequired();
-            entity.Property(e => e.SensorType).IsRequired().HasMaxLength(50);
-            entity.Property(e => e.Value).IsRequired().HasPrecision(18, 4);
-            entity.Property(e => e.Unit).IsRequired().HasMaxLength(20);
-            entity.Property(e => e.ReadingTimestamp).IsRequired();
+
+            // Old fields (single sensor readings)
+            entity.Property(e => e.SensorType).HasMaxLength(50);
+            entity.Property(e => e.Value).HasPrecision(18, 4);
+            entity.Property(e => e.Unit).HasMaxLength(20);
+            entity.Property(e => e.ReadingTimestamp);
             entity.Property(e => e.Location).HasMaxLength(200);
             entity.Property(e => e.Metadata)
                 .HasConversion(
                     v => v == null ? (string?)null : ConvertDictionaryToJson(v),
                     v => string.IsNullOrEmpty(v) ? null : ConvertJsonToDictionary(v))
-                .HasColumnType("TEXT"); // Use TEXT for SQLite compatibility (works with SQL Server too)
+                .HasColumnType("TEXT");
+
+            // New aggregated telemetry fields
+            entity.Property(e => e.SoilMoisture).HasPrecision(18, 4);
+            entity.Property(e => e.AirTemperature).HasPrecision(18, 4);
+            entity.Property(e => e.Precipitation).HasPrecision(18, 4);
+            entity.Property(e => e.IsRichInPests);
+
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt);
             
             entity.HasIndex(e => e.FieldId);
-            entity.HasIndex(e => e.SensorType);
             entity.HasIndex(e => e.ReadingTimestamp);
-            entity.HasIndex(e => new { e.FieldId, e.SensorType, e.ReadingTimestamp });
+            entity.HasIndex(e => e.CreatedAt);
         });
 
         // Configure User
@@ -119,20 +135,15 @@ public class AgroSolutionsDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.FieldId).IsRequired();
-            entity.Property(e => e.FarmId).IsRequired();
             entity.Property(e => e.Status).IsRequired().HasConversion<int>();
-            entity.Property(e => e.Message).IsRequired().HasMaxLength(500);
-            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.IsEnable).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt);
             
             entity.HasIndex(e => e.FieldId);
-            entity.HasIndex(e => e.FarmId);
             entity.HasIndex(e => e.Status);
-            entity.HasIndex(e => e.IsActive);
+            entity.HasIndex(e => e.IsEnable);
             entity.HasIndex(e => e.CreatedAt);
-            entity.HasIndex(e => new { e.FieldId, e.IsActive });
-            entity.HasIndex(e => new { e.FarmId, e.IsActive });
         });
     }
 

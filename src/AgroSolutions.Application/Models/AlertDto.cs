@@ -3,18 +3,16 @@ using AgroSolutions.Domain.Enums;
 namespace AgroSolutions.Application.Models;
 
 /// <summary>
-/// DTO for Alert response
+/// DTO for Alert response aligned with diagram:
+/// Id, FieldPlotId (FieldId), Status, IsEnable, CreatedAt
 /// </summary>
 public class AlertDto
 {
     public Guid Id { get; set; }
     public Guid FieldId { get; set; }
-    public Guid FarmId { get; set; }
     public AlertStatus Status { get; set; }
-    public string Message { get; set; } = string.Empty;
-    public bool IsActive { get; set; }
+    public bool IsEnable { get; set; }
     public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
 }
 
 /// <summary>

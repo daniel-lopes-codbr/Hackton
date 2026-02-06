@@ -68,15 +68,29 @@ public class IngestBatchParallelCommandHandler : IRequestHandler<IngestBatchPara
             {
                 try
                 {
-                    var reading = new SensorReading(
-                        dto.FieldId,
-                        dto.SensorType,
-                        dto.Value,
-                        dto.Unit,
-                        dto.ReadingTimestamp,
-                        dto.Location,
-                        dto.Metadata
-                    );
+                    SensorReading reading;
+                    if (!string.IsNullOrWhiteSpace(dto.SensorType))
+                    {
+                        reading = new SensorReading(
+                            dto.FieldId,
+                            dto.SensorType!,
+                            dto.Value ?? 0m,
+                            dto.Unit ?? string.Empty,
+                            dto.ReadingTimestamp ?? DateTime.UtcNow,
+                            dto.Location,
+                            dto.Metadata
+                        );
+                    }
+                    else
+                    {
+                        reading = new SensorReading(
+                            dto.FieldId,
+                            dto.SoilMoisture,
+                            dto.AirTemperature,
+                            dto.Precipitation,
+                            dto.IsRichInPests
+                        );
+                    }
                     readingsToAdd.Add(reading);
                     Interlocked.Increment(ref processedCount);
                 }

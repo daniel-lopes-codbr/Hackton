@@ -38,16 +38,32 @@ public class IngestSingleCommandHandler : IRequestHandler<IngestSingleCommand, R
     {
         try
         {
-            // Create Entity
-            var reading = new SensorReading(
-                request.Reading.FieldId,
-                request.Reading.SensorType,
-                request.Reading.Value,
-                request.Reading.Unit,
-                request.Reading.ReadingTimestamp,
-                request.Reading.Location,
-                request.Reading.Metadata
-            );
+            // Create Entity - support both old single-sensor shape and new aggregated telemetry
+            SensorReading reading;
+            if (!string.IsNullOrWhiteSpace(request.Reading.SensorType))
+            {
+                // Old-style single sensor reading
+                reading = new SensorReading(
+                    request.Reading.FieldId,
+                    request.Reading.SensorType!,
+                    request.Reading.Value ?? 0m,
+                    request.Reading.Unit ?? string.Empty,
+                    request.Reading.ReadingTimestamp ?? DateTime.UtcNow,
+                    request.Reading.Location,
+                    request.Reading.Metadata
+                );
+            }
+            else
+            {
+                // Aggregated telemetry
+                reading = new SensorReading(
+                    request.Reading.FieldId,
+                    request.Reading.SoilMoisture,
+                    request.Reading.AirTemperature,
+                    request.Reading.Precipitation,
+                    request.Reading.IsRichInPests
+                );
+            }
 
             // Save
             await _repository.AddAsync(reading, cancellationToken);
@@ -56,7 +72,7 @@ public class IngestSingleCommandHandler : IRequestHandler<IngestSingleCommand, R
             // Map Entity → DTO using AutoMapper
             var readingDto = _mapper.Map<Models.SensorReadingDto>(reading);
 
-            _logger.LogInformation("Ingested single reading: {SensorType} for Field {FieldId}", reading.SensorType, reading.FieldId);
+            _logger.LogInformation("Ingested single telemetry for Field {FieldId}", reading.FieldId);
 
             return Result<Models.SensorReadingDto>.Success(readingDto);
         }

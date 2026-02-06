@@ -10,8 +10,7 @@ namespace AgroSolutions.Application.Commands.Fields;
 public class UpdateFieldCommand : IRequest<Result<FieldDto>>
 {
     public Guid Id { get; set; }
-    public PropertyDto? Property { get; set; }
+    public string? Name { get; set; }
+    public decimal? AreaSquareMeters { get; set; }
     public string? CropType { get; set; }
-    public DateTime? PlantingDate { get; set; }
-    public DateTime? HarvestDate { get; set; }
 }

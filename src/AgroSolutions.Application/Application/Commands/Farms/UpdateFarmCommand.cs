@@ -10,9 +10,10 @@ namespace AgroSolutions.Application.Commands.Farms;
 public class UpdateFarmCommand : IRequest<Result<FarmDto>>
 {
     public Guid Id { get; set; }
+    public string? Name { get; set; }
     public Guid? UserId { get; set; }
-    public PropertyDto? Property { get; set; }
-    public string? OwnerName { get; set; }
-    public string? OwnerEmail { get; set; }
-    public string? OwnerPhone { get; set; }
+    public decimal? WidthMeters { get; set; }
+    public decimal? LengthMeters { get; set; }
+    public decimal? TotalAreaSquareMeters { get; set; }
+    public decimal? Precipitation { get; set; }
 }

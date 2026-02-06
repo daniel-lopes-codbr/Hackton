@@ -17,10 +17,10 @@ namespace AgroSolutions.Api.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     FieldId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    FarmId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Status = table.Column<int>(type: "INTEGER", nullable: false),
-                    Message = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
-                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsEnable = table.Column<bool>(type: "INTEGER", nullable: false),
+                    FarmId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    Message = table.Column<string>(type: "TEXT", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
@@ -35,18 +35,37 @@ namespace AgroSolutions.Api.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     FieldId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    SensorType = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Value = table.Column<decimal>(type: "TEXT", precision: 18, scale: 4, nullable: false),
-                    Unit = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    ReadingTimestamp = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    SensorType = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Value = table.Column<decimal>(type: "TEXT", precision: 18, scale: 4, nullable: true),
+                    Unit = table.Column<string>(type: "TEXT", maxLength: 20, nullable: true),
+                    ReadingTimestamp = table.Column<DateTime>(type: "TEXT", nullable: true),
                     Location = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     Metadata = table.Column<string>(type: "TEXT", nullable: true),
+                    SoilMoisture = table.Column<decimal>(type: "TEXT", precision: 18, scale: 4, nullable: true),
+                    AirTemperature = table.Column<decimal>(type: "TEXT", precision: 18, scale: 4, nullable: true),
+                    Precipitation = table.Column<decimal>(type: "TEXT", precision: 18, scale: 4, nullable: true),
+                    IsRichInPests = table.Column<bool>(type: "INTEGER", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SensorReadings", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserAuthorizations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    PermissionType = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserAuthorizations", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -71,13 +90,18 @@ namespace AgroSolutions.Api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Property_Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
-                    Property_Location = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
-                    Property_Area = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
-                    Property_Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     UserId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    OwnerName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
-                    OwnerEmail = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    WidthMeters = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
+                    LengthMeters = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
+                    TotalAreaSquareMeters = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
+                    Precipitation = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: true),
+                    Property_Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    Property_Location = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    Property_Area = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: true),
+                    Property_Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    OwnerName = table.Column<string>(type: "TEXT", nullable: true),
+                    OwnerEmail = table.Column<string>(type: "TEXT", nullable: true),
                     OwnerPhone = table.Column<string>(type: "TEXT", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
@@ -99,11 +123,13 @@ namespace AgroSolutions.Api.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     FarmId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Property_Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
-                    Property_Location = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
-                    Property_Area = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
-                    Property_Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    AreaSquareMeters = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: false),
                     CropType = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Property_Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    Property_Location = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    Property_Area = table.Column<decimal>(type: "TEXT", precision: 18, scale: 2, nullable: true),
+                    Property_Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
                     PlantingDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     HarvestDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -126,29 +152,14 @@ namespace AgroSolutions.Api.Migrations
                 column: "CreatedAt");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Alerts_FarmId",
-                table: "Alerts",
-                column: "FarmId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Alerts_FarmId_IsActive",
-                table: "Alerts",
-                columns: new[] { "FarmId", "IsActive" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Alerts_FieldId",
                 table: "Alerts",
                 column: "FieldId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Alerts_FieldId_IsActive",
+                name: "IX_Alerts_IsEnable",
                 table: "Alerts",
-                columns: new[] { "FieldId", "IsActive" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Alerts_IsActive",
-                table: "Alerts",
-                column: "IsActive");
+                column: "IsEnable");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Alerts_Status",
@@ -166,24 +177,19 @@ namespace AgroSolutions.Api.Migrations
                 column: "FarmId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SensorReadings_CreatedAt",
+                table: "SensorReadings",
+                column: "CreatedAt");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SensorReadings_FieldId",
                 table: "SensorReadings",
                 column: "FieldId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SensorReadings_FieldId_SensorType_ReadingTimestamp",
-                table: "SensorReadings",
-                columns: new[] { "FieldId", "SensorType", "ReadingTimestamp" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_SensorReadings_ReadingTimestamp",
                 table: "SensorReadings",
                 column: "ReadingTimestamp");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SensorReadings_SensorType",
-                table: "SensorReadings",
-                column: "SensorType");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
@@ -208,6 +214,9 @@ namespace AgroSolutions.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "SensorReadings");
+
+            migrationBuilder.DropTable(
+                name: "UserAuthorizations");
 
             migrationBuilder.DropTable(
                 name: "Farms");

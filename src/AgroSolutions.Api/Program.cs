@@ -220,6 +220,9 @@ try
 
     var app = builder.Build();
 
+    // Allow skipping DB initialization during design-time (EF tools) by setting SKIP_DB_INIT=1
+    var skipDbInit = string.Equals(Environment.GetEnvironmentVariable("SKIP_DB_INIT"), "1", StringComparison.OrdinalIgnoreCase);
+    
     // Configure the HTTP request pipeline
     if (app.Environment.IsDevelopment())
     {
@@ -276,8 +279,10 @@ try
     });
 
     // Ensure database is created and seeded (for SQLite, InMemory, or SQL Server)
-    using (var scope = app.Services.CreateScope())
+    if (!skipDbInit)
     {
+        using (var scope = app.Services.CreateScope())
+        {
         var context = scope.ServiceProvider.GetRequiredService<AgroSolutionsDbContext>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         
@@ -445,6 +450,7 @@ try
         {
             logger.LogError(ex, "✗ Error during database setup: {ErrorMessage}\nStackTrace: {StackTrace}", ex.Message, ex.StackTrace);
             // Don't throw - allow application to start even if database setup fails
+        }
         }
     }
 

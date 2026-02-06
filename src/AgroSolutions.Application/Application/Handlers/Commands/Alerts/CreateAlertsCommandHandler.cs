@@ -91,29 +91,19 @@ public class CreateAlertsCommandHandler : IRequestHandler<CreateAlertsCommand, R
                         continue;
                     }
 
-                    // Check for Drought Alert (Soil Moisture < 30% for more than 24 hours)
+                    // Check for Drought Alert (Soil Moisture < 30% in the last 24 hours)
                     var droughtAlert = await CheckDroughtConditionAsync(fieldId, cancellationToken);
-                    if (droughtAlert != null)
+                    if (droughtAlert)
                     {
-                        alertsToCreate.Add(new Alert(
-                            fieldId,
-                            field.FarmId,
-                            AlertStatus.DroughtAlert,
-                            droughtAlert
-                        ));
+                        alertsToCreate.Add(new Alert(fieldId, AlertStatus.DroughtAlert, true));
                         response.AlertsCreated++;
                     }
 
-                    // Check for Pest Risk (based on air humidity or temperature)
+                    // Check for Pest Risk (based on air temperature or IsRichInPests flag)
                     var pestRiskAlert = CheckPestRiskCondition(fieldGroup.ToList());
-                    if (pestRiskAlert != null)
+                    if (pestRiskAlert)
                     {
-                        alertsToCreate.Add(new Alert(
-                            fieldId,
-                            field.FarmId,
-                            AlertStatus.PestRisk,
-                            pestRiskAlert
-                        ));
+                        alertsToCreate.Add(new Alert(fieldId, AlertStatus.PestRisk, true));
                         response.AlertsCreated++;
                     }
 
@@ -170,105 +160,42 @@ public class CreateAlertsCommandHandler : IRequestHandler<CreateAlertsCommand, R
     }
 
     /// <summary>
-    /// Check if drought condition exists (soil moisture < 30% for more than 24 hours)
+    /// Check if drought condition exists (soil moisture < 30% in the last 24 hours)
     /// </summary>
-    private async Task<string?> CheckDroughtConditionAsync(Guid fieldId, CancellationToken cancellationToken)
+    private async Task<bool> CheckDroughtConditionAsync(Guid fieldId, CancellationToken cancellationToken)
     {
-        // Get all soil moisture readings for this field
-        var soilMoistureReadings = await _sensorReadingRepository.GetByFieldIdAndSensorTypeAsync(
-            fieldId, 
-            SoilMoistureSensorType, 
-            cancellationToken);
-
-        if (!soilMoistureReadings.Any())
-            return null;
-
-        // Order by timestamp descending (most recent first)
-        var orderedReadings = soilMoistureReadings
-            .OrderByDescending(r => r.ReadingTimestamp)
-            .ToList();
-
-        // Check if we have readings spanning more than 24 hours
-        var oldestReading = orderedReadings.Last();
-        var newestReading = orderedReadings.First();
-        var timeSpan = newestReading.ReadingTimestamp - oldestReading.ReadingTimestamp;
-
-        if (timeSpan.TotalHours < DroughtDurationHours)
-            return null; // Not enough data for 24-hour analysis
-
-        // Check if all readings in the last 24 hours are below threshold
         var twentyFourHoursAgo = DateTime.UtcNow.AddHours(-DroughtDurationHours);
-        var recentReadings = orderedReadings
-            .Where(r => r.ReadingTimestamp >= twentyFourHoursAgo)
+        var readings = await _sensorReadingRepository.GetByFieldIdAsync(fieldId, cancellationToken);
+
+        var recentReadings = readings
+            .Where(r => r.CreatedAt >= twentyFourHoursAgo && r.SoilMoisture.HasValue)
             .ToList();
 
         if (!recentReadings.Any())
-            return null;
+            return false;
 
-        // Check if all readings are below threshold
-        var allBelowThreshold = recentReadings.All(r => r.Value < DroughtThreshold);
-
-        if (allBelowThreshold)
-        {
-            var lowestValue = recentReadings.Min(r => r.Value);
-            return $"Soil moisture below {DroughtThreshold}% for more than {DroughtDurationHours} hours. Current value: {lowestValue:F2}%";
-        }
-
-        return null;
+        var allBelowThreshold = recentReadings.All(r => r.SoilMoisture!.Value < DroughtThreshold);
+        return allBelowThreshold;
     }
 
     /// <summary>
-    /// Check for pest risk conditions based on air humidity or temperature
+    /// Check for pest risk conditions based on air temperature or explicit pest flag
     /// </summary>
-    private string? CheckPestRiskCondition(List<SensorReading> readings)
+    private bool CheckPestRiskCondition(List<SensorReading> readings)
     {
-        // Check for high humidity (favorable for pests)
-        var humidityReadings = readings
-            .Where(r => r.SensorType.Equals("Humidity", StringComparison.OrdinalIgnoreCase) ||
-                       r.SensorType.Equals("AirHumidity", StringComparison.OrdinalIgnoreCase))
-            .ToList();
+        // If any reading has IsRichInPests true, we consider pest risk
+        if (readings.Any(r => r.IsRichInPests == true))
+            return true;
 
-        if (humidityReadings.Any())
+        // Check average air temperature over the readings (if available)
+        var tempValues = readings.Where(r => r.AirTemperature.HasValue).Select(r => r.AirTemperature!.Value).ToList();
+        if (tempValues.Any())
         {
-            var avgHumidity = humidityReadings.Average(r => r.Value);
-            // High humidity (> 80%) can indicate pest risk
-            if (avgHumidity > 80m)
-            {
-                return $"High air humidity detected ({avgHumidity:F2}%). Conditions favorable for pest development.";
-            }
+            var avgTemp = tempValues.Average();
+            if (avgTemp > 30m) // threshold for pest risk
+                return true;
         }
 
-        // Check metadata for temperature and humidity indicators
-        foreach (var reading in readings)
-        {
-            if (reading.Metadata != null)
-            {
-                // Check for temperature in metadata
-                if (reading.Metadata.TryGetValue("Temperature", out var tempStr) ||
-                    reading.Metadata.TryGetValue("temperature", out tempStr))
-                {
-                    if (decimal.TryParse(tempStr, out var temperature))
-                    {
-                        // High temperature (> 30°C) combined with humidity can indicate pest risk
-                        if (temperature > 30m && humidityReadings.Any(h => h.Value > 70m))
-                        {
-                            return $"High temperature ({temperature:F2}°C) and humidity detected. Pest risk conditions present.";
-                        }
-                    }
-                }
-
-                // Check for humidity in metadata
-                if (reading.Metadata.TryGetValue("Humidity", out var humStr) ||
-                    reading.Metadata.TryGetValue("humidity", out humStr))
-                {
-                    if (decimal.TryParse(humStr, out var humidity) && humidity > 80m)
-                    {
-                        return $"High humidity detected in metadata ({humidity:F2}%). Pest risk conditions present.";
-                    }
-                }
-            }
-        }
-
-        return null;
+        return false;
     }
 }

@@ -10,7 +10,6 @@ public interface IAlertRepository
     Task<Alert?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IEnumerable<Alert>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<Alert>> GetByFieldIdAsync(Guid fieldId, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Alert>> GetByFarmIdAsync(Guid farmId, CancellationToken cancellationToken = default);
     Task<IEnumerable<Alert>> GetActiveAlertsAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<Alert>> GetAlertsCreatedBeforeAsync(DateTime date, CancellationToken cancellationToken = default);
     Task<Alert> AddAsync(Alert alert, CancellationToken cancellationToken = default);

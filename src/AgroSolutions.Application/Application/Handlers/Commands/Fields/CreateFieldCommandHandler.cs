@@ -47,18 +47,11 @@ public class CreateFieldCommandHandler : IRequestHandler<CreateFieldCommand, Res
             return Result<Models.FieldDto>.Failure(_notificationContext.Notifications);
         }
 
-        // Create Value Object
-        var property = new Property(
-            request.Property.Name,
-            request.Property.Location,
-            request.Property.Area,
-            request.Property.Description
-        );
-
         // Create Entity
         var field = new Domain.Entities.Field(
             request.FarmId,
-            property,
+            request.Name,
+            request.AreaSquareMeters,
             request.CropType
         );
 

@@ -19,5 +19,7 @@ public class UserMappingProfile : Profile
         
         // Entity → DTO (usado no Handler)
         CreateMap<User, UserDto>();
+        CreateMap<UserAuthorization, UserAuthorizationDto>()
+            .ForMember(dest => dest.LastUpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
     }
 }

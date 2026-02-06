@@ -27,7 +27,7 @@ public class SensorReadingRepository : ISensorReadingRepository
     {
         return await _context.SensorReadings
             .Where(r => r.FieldId == fieldId)
-            .OrderByDescending(r => r.ReadingTimestamp)
+            .OrderByDescending(r => r.CreatedAt)
             .ToListAsync(cancellationToken);
     }
 
@@ -42,8 +42,8 @@ public class SensorReadingRepository : ISensorReadingRepository
     public async Task<IEnumerable<SensorReading>> GetByTimestampRangeAsync(DateTime startTime, DateTime endTime, CancellationToken cancellationToken = default)
     {
         return await _context.SensorReadings
-            .Where(r => r.ReadingTimestamp >= startTime && r.ReadingTimestamp <= endTime)
-            .OrderByDescending(r => r.ReadingTimestamp)
+            .Where(r => r.CreatedAt >= startTime && r.CreatedAt <= endTime)
+            .OrderByDescending(r => r.CreatedAt)
             .ToListAsync(cancellationToken);
     }
 

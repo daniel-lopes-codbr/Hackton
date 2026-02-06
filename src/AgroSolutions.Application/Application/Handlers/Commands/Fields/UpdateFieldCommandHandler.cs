@@ -43,26 +43,21 @@ public class UpdateFieldCommandHandler : IRequestHandler<UpdateFieldCommand, Res
             return Result<Models.FieldDto>.Failure(_notificationContext.Notifications);
         }
 
-        // Update property if provided
-        if (request.Property != null)
+        // Update name/area if provided
+        if (!string.IsNullOrWhiteSpace(request.Name))
         {
-            var property = new Property(
-                request.Property.Name,
-                request.Property.Location,
-                request.Property.Area,
-                request.Property.Description
-            );
-            field.UpdateProperty(property);
+            field.UpdateName(request.Name);
+        }
+
+        if (request.AreaSquareMeters.HasValue)
+        {
+            field.UpdateArea(request.AreaSquareMeters.Value);
         }
 
         // Update crop info if provided
         if (!string.IsNullOrWhiteSpace(request.CropType))
         {
-            field.UpdateCropInfo(
-                request.CropType,
-                request.PlantingDate,
-                request.HarvestDate
-            );
+            field.UpdateCropType(request.CropType);
         }
 
         // Save changes

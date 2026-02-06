@@ -1,18 +1,20 @@
 namespace AgroSolutions.Application.Models;
 
 /// <summary>
-/// DTO for Farm response
+/// DTO for Farm response matching diagram:
+/// Id, Name, UserId, WidthMeters, LengthMeters, TotalAreaSquareMeters, Precipitation, CreatedAt, LastUpdatedAt
 /// </summary>
 public class FarmDto
 {
     public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
     public Guid? UserId { get; set; }
-    public PropertyDto Property { get; set; } = null!;
-    public string OwnerName { get; set; } = string.Empty;
-    public string? OwnerEmail { get; set; }
-    public string? OwnerPhone { get; set; }
+    public decimal WidthMeters { get; set; }
+    public decimal LengthMeters { get; set; }
+    public decimal TotalAreaSquareMeters { get; set; }
+    public decimal? Precipitation { get; set; }
     public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime? LastUpdatedAt { get; set; }
 }
 
 /// <summary>
@@ -20,11 +22,12 @@ public class FarmDto
 /// </summary>
 public class CreateFarmDto
 {
+    public string Name { get; set; } = string.Empty;
     public Guid? UserId { get; set; }
-    public PropertyDto Property { get; set; } = null!;
-    public string OwnerName { get; set; } = string.Empty;
-    public string? OwnerEmail { get; set; }
-    public string? OwnerPhone { get; set; }
+    public decimal WidthMeters { get; set; }
+    public decimal LengthMeters { get; set; }
+    public decimal? TotalAreaSquareMeters { get; set; }
+    public decimal? Precipitation { get; set; }
 }
 
 /// <summary>
@@ -32,20 +35,10 @@ public class CreateFarmDto
 /// </summary>
 public class UpdateFarmDto
 {
+    public string? Name { get; set; }
     public Guid? UserId { get; set; }
-    public PropertyDto? Property { get; set; }
-    public string? OwnerName { get; set; }
-    public string? OwnerEmail { get; set; }
-    public string? OwnerPhone { get; set; }
-}
-
-/// <summary>
-/// DTO for Property (Value Object)
-/// </summary>
-public class PropertyDto
-{
-    public string Name { get; set; } = string.Empty;
-    public string Location { get; set; } = string.Empty;
-    public decimal Area { get; set; }
-    public string? Description { get; set; }
+    public decimal? WidthMeters { get; set; }
+    public decimal? LengthMeters { get; set; }
+    public decimal? TotalAreaSquareMeters { get; set; }
+    public decimal? Precipitation { get; set; }
 }

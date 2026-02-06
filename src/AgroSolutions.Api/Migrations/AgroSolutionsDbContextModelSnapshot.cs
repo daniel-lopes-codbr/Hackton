@@ -25,18 +25,16 @@ namespace AgroSolutions.Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("FarmId")
+                    b.Property<Guid?>("FarmId")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("FieldId")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("IsEnable")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Status")
@@ -49,17 +47,11 @@ namespace AgroSolutions.Api.Migrations
 
                     b.HasIndex("CreatedAt");
 
-                    b.HasIndex("FarmId");
-
                     b.HasIndex("FieldId");
 
-                    b.HasIndex("IsActive");
+                    b.HasIndex("IsEnable");
 
                     b.HasIndex("Status");
-
-                    b.HasIndex("FarmId", "IsActive");
-
-                    b.HasIndex("FieldId", "IsActive");
 
                     b.ToTable("Alerts");
                 });
@@ -72,22 +64,40 @@ namespace AgroSolutions.Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("OwnerEmail")
-                        .HasMaxLength(200)
+                    b.Property<decimal>("LengthMeters")
+                        .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("OwnerName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("OwnerEmail")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OwnerName")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("OwnerPhone")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("Precipitation")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("TotalAreaSquareMeters")
+                        .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("WidthMeters")
+                        .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -102,6 +112,10 @@ namespace AgroSolutions.Api.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal>("AreaSquareMeters")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
@@ -114,6 +128,11 @@ namespace AgroSolutions.Api.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("HarvestDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("PlantingDate")
@@ -134,11 +153,18 @@ namespace AgroSolutions.Api.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal?>("AirTemperature")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("FieldId")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool?>("IsRichInPests")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Location")
                         .HasMaxLength(200)
@@ -147,35 +173,39 @@ namespace AgroSolutions.Api.Migrations
                     b.Property<string>("Metadata")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("ReadingTimestamp")
+                    b.Property<decimal?>("Precipitation")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ReadingTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SensorType")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal?>("SoilMoisture")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Unit")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Value")
+                    b.Property<decimal?>("Value")
                         .HasPrecision(18, 4)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedAt");
+
                     b.HasIndex("FieldId");
 
                     b.HasIndex("ReadingTimestamp");
-
-                    b.HasIndex("SensorType");
-
-                    b.HasIndex("FieldId", "SensorType", "ReadingTimestamp");
 
                     b.ToTable("SensorReadings");
                 });
@@ -221,6 +251,30 @@ namespace AgroSolutions.Api.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("AgroSolutions.Domain.Entities.UserAuthorization", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PermissionType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserAuthorizations");
+                });
+
             modelBuilder.Entity("AgroSolutions.Domain.Entities.Farm", b =>
                 {
                     b.HasOne("AgroSolutions.Domain.Entities.User", null)
@@ -259,8 +313,7 @@ namespace AgroSolutions.Api.Migrations
                                 .HasForeignKey("FarmId");
                         });
 
-                    b.Navigation("Property")
-                        .IsRequired();
+                    b.Navigation("Property");
                 });
 
             modelBuilder.Entity("AgroSolutions.Domain.Entities.Field", b =>
@@ -302,8 +355,7 @@ namespace AgroSolutions.Api.Migrations
                                 .HasForeignKey("FieldId");
                         });
 
-                    b.Navigation("Property")
-                        .IsRequired();
+                    b.Navigation("Property");
                 });
 #pragma warning restore 612, 618
         }

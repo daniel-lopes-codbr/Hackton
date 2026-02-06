@@ -21,6 +21,12 @@ public class IngestionMappingProfile : Profile
             .ForMember(dest => dest.Batch, opt => opt.MapFrom(src => src));
         
         // Entity → DTO (usado no Handler)
-        CreateMap<SensorReading, SensorReadingDto>();
+        CreateMap<SensorReading, SensorReadingDto>()
+            .ForMember(dest => dest.FieldId, opt => opt.MapFrom(src => src.FieldId))
+            .ForMember(dest => dest.SoilMoisture, opt => opt.MapFrom(src => src.SoilMoisture))
+            .ForMember(dest => dest.AirTemperature, opt => opt.MapFrom(src => src.AirTemperature))
+            .ForMember(dest => dest.Precipitation, opt => opt.MapFrom(src => src.Precipitation))
+            .ForMember(dest => dest.IsRichInPests, opt => opt.MapFrom(src => src.IsRichInPests))
+            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
     }
 }

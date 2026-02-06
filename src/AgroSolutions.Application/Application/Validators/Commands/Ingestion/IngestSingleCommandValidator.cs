@@ -16,24 +16,12 @@ public class IngestSingleCommandValidator : AbstractValidator<IngestSingleComman
         RuleFor(x => x.Reading.FieldId)
             .NotEmpty().WithMessage("Field ID is required")
             .When(x => x.Reading != null);
-
-        RuleFor(x => x.Reading.SensorType)
-            .NotEmpty().WithMessage("Sensor type is required")
-            .MaximumLength(50).WithMessage("Sensor type must not exceed 50 characters")
-            .When(x => x.Reading != null);
-
-        RuleFor(x => x.Reading.Value)
-            .NotNull().WithMessage("Value is required")
-            .When(x => x.Reading != null);
-
-        RuleFor(x => x.Reading.Unit)
-            .NotEmpty().WithMessage("Unit is required")
-            .MaximumLength(20).WithMessage("Unit must not exceed 20 characters")
-            .When(x => x.Reading != null);
-
-        RuleFor(x => x.Reading.ReadingTimestamp)
-            .NotEmpty().WithMessage("Reading timestamp is required")
-            .When(x => x.Reading != null);
+        // Reading must contain either legacy single-sensor fields (SensorType + Value) OR aggregated telemetry fields
+        RuleFor(x => x.Reading)
+            .Must(r =>
+                (!string.IsNullOrWhiteSpace(r.SensorType) && r.Value.HasValue) ||
+                r.SoilMoisture.HasValue || r.AirTemperature.HasValue || r.Precipitation.HasValue || r.IsRichInPests.HasValue
+            ).WithMessage("Reading must contain either SensorType+Value or at least one aggregated telemetry field (SoilMoisture/AirTemperature/Precipitation/IsRichInPests)");
 
         RuleFor(x => x.Reading.Location)
             .MaximumLength(200).WithMessage("Location must not exceed 200 characters")

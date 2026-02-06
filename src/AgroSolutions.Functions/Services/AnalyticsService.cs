@@ -102,8 +102,31 @@ public class AnalyticsService : IAnalyticsService
         {
             _fieldReadings[reading.FieldId] = new List<SensorReading>();
         }
-
-        _fieldReadings[reading.FieldId].Add(reading);
+        // If reading contains a SensorType/value, add directly
+        if (!string.IsNullOrWhiteSpace(reading.SensorType))
+        {
+            _fieldReadings[reading.FieldId].Add(reading);
+        }
+        else
+        {
+            // For aggregated telemetry, create synthetic readings per metric to allow trend/statistics reuse
+            var timestamp = reading.ReadingTimestamp ?? reading.CreatedAt;
+            if (reading.SoilMoisture.HasValue)
+            {
+                var r = new SensorReading(reading.FieldId, "SoilMoisture", reading.SoilMoisture.Value, "Percent", timestamp);
+                _fieldReadings[reading.FieldId].Add(r);
+            }
+            if (reading.AirTemperature.HasValue)
+            {
+                var r = new SensorReading(reading.FieldId, "AirTemperature", reading.AirTemperature.Value, "Celsius", timestamp);
+                _fieldReadings[reading.FieldId].Add(r);
+            }
+            if (reading.Precipitation.HasValue)
+            {
+                var r = new SensorReading(reading.FieldId, "Precipitation", reading.Precipitation.Value, "mm", timestamp);
+                _fieldReadings[reading.FieldId].Add(r);
+            }
+        }
 
         // Keep only last 1000 readings per field to prevent memory issues
         if (_fieldReadings[reading.FieldId].Count > 1000)

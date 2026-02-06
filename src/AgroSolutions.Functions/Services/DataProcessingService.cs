@@ -29,8 +29,13 @@ public class DataProcessingService : IDataProcessingService
 
     public async Task<ProcessedReading> ProcessReadingAsync(SensorReading reading, CancellationToken cancellationToken = default)
     {
+        // Support both legacy single-sensor readings and aggregated telemetry
+        string sensorType = reading.SensorType ?? (reading.SoilMoisture.HasValue ? "SoilMoisture" : (reading.AirTemperature.HasValue ? "AirTemperature" : "Telemetry"));
+        decimal value = reading.Value ?? (reading.SoilMoisture ?? reading.AirTemperature ?? reading.Precipitation ?? 0m);
+        string unit = reading.Unit ?? (sensorType == "SoilMoisture" ? "Percent" : sensorType == "AirTemperature" ? "Celsius" : string.Empty);
+
         _logger.LogInformation("Processing reading: {SensorType} = {Value} {Unit} for Field {FieldId}",
-            reading.SensorType, reading.Value, reading.Unit, reading.FieldId);
+            sensorType, value, unit, reading.FieldId);
 
         var processed = new ProcessedReading
         {
@@ -39,10 +44,10 @@ public class DataProcessingService : IDataProcessingService
         };
 
         // Normalize value based on sensor type
-        processed.NormalizedValue = NormalizeValue(reading.SensorType, reading.Value, reading.Unit);
+        processed.NormalizedValue = NormalizeValue(sensorType, value, unit);
 
-        // Detect anomalies
-        var anomalyResult = DetectAnomaly(reading);
+        // Detect anomalies: if IsRichInPests set -> mark as anomaly
+        var anomalyResult = DetectAnomaly(reading, sensorType, value, unit);
         processed.IsAnomaly = anomalyResult.IsAnomaly;
         processed.AnomalyReason = anomalyResult.Reason;
 
@@ -80,15 +85,18 @@ public class DataProcessingService : IDataProcessingService
             _ => value // Keep original if unknown
         };
     }
-
-    private (bool IsAnomaly, string? Reason) DetectAnomaly(SensorReading reading)
+    private (bool IsAnomaly, string? Reason) DetectAnomaly(SensorReading reading, string sensorType, decimal value, string unit)
     {
-        if (!_sensorThresholds.TryGetValue(reading.SensorType, out var threshold))
+        // If explicit pest flag set, treat as anomaly
+        if (reading.IsRichInPests == true)
+            return (true, "Pest indicators present");
+
+        if (!_sensorThresholds.TryGetValue(sensorType, out var threshold))
         {
             return (false, null); // Unknown sensor type, no anomaly detection
         }
 
-        var normalizedValue = NormalizeValue(reading.SensorType, reading.Value, reading.Unit) ?? reading.Value;
+        var normalizedValue = NormalizeValue(sensorType, value, unit) ?? value;
 
         if (normalizedValue < threshold.Min)
         {
@@ -108,14 +116,15 @@ public class DataProcessingService : IDataProcessingService
         var insights = new Dictionary<string, object>();
 
         // Get trend analysis
-        var trend = await _analyticsService.GetTrendAsync(reading.FieldId, reading.SensorType, cancellationToken);
+        var sensorType = reading.SensorType ?? (reading.SoilMoisture.HasValue ? "SoilMoisture" : (reading.AirTemperature.HasValue ? "AirTemperature" : "Telemetry"));
+        var trend = await _analyticsService.GetTrendAsync(reading.FieldId, sensorType, cancellationToken);
         if (trend != null)
         {
             insights["trend"] = trend;
         }
 
         // Calculate statistics
-        var stats = await _analyticsService.GetStatisticsAsync(reading.FieldId, reading.SensorType, cancellationToken);
+        var stats = await _analyticsService.GetStatisticsAsync(reading.FieldId, sensorType, cancellationToken);
         if (stats != null)
         {
             insights["statistics"] = stats;
@@ -134,9 +143,12 @@ public class DataProcessingService : IDataProcessingService
     private List<string> GetRecommendations(SensorReading reading)
     {
         var recommendations = new List<string>();
-        var normalizedValue = NormalizeValue(reading.SensorType, reading.Value, reading.Unit) ?? reading.Value;
+        var sensorTypeForRecommendations = reading.SensorType ?? (reading.SoilMoisture.HasValue ? "SoilMoisture" : (reading.AirTemperature.HasValue ? "AirTemperature" : string.Empty));
+        var valueForRecommendations = reading.Value ?? (reading.SoilMoisture ?? reading.AirTemperature ?? reading.Precipitation ?? 0m);
+        var unitForRecommendations = reading.Unit ?? (sensorTypeForRecommendations == "SoilMoisture" ? "Percent" : sensorTypeForRecommendations == "AirTemperature" ? "Celsius" : string.Empty);
+        var normalizedValue = NormalizeValue(sensorTypeForRecommendations, valueForRecommendations, unitForRecommendations) ?? valueForRecommendations;
 
-        switch (reading.SensorType.ToLowerInvariant())
+        switch (sensorTypeForRecommendations.ToLowerInvariant())
         {
             case "temperature":
                 if (normalizedValue > 35)

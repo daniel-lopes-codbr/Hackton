@@ -10,6 +10,7 @@ namespace AgroSolutions.Application.Commands.Fields;
 public class CreateFieldCommand : IRequest<Result<FieldDto>>
 {
     public Guid FarmId { get; set; }
-    public PropertyDto Property { get; set; } = null!;
+    public string Name { get; set; } = string.Empty;
+    public decimal AreaSquareMeters { get; set; }
     public string CropType { get; set; } = string.Empty;
 }

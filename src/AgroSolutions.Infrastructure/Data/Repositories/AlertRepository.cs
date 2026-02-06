@@ -38,18 +38,12 @@ public class AlertRepository : IAlertRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Alert>> GetByFarmIdAsync(Guid farmId, CancellationToken cancellationToken = default)
-    {
-        return await _context.Alerts
-            .Where(a => a.FarmId == farmId)
-            .OrderByDescending(a => a.CreatedAt)
-            .ToListAsync(cancellationToken);
-    }
+    // If needed, alerts by farm can be obtained by joining fields -> farms in a custom query/service.
 
     public async Task<IEnumerable<Alert>> GetActiveAlertsAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Alerts
-            .Where(a => a.IsActive)
+            .Where(a => a.IsEnable)
             .OrderByDescending(a => a.CreatedAt)
             .ToListAsync(cancellationToken);
     }
@@ -57,7 +51,7 @@ public class AlertRepository : IAlertRepository
     public async Task<IEnumerable<Alert>> GetAlertsCreatedBeforeAsync(DateTime date, CancellationToken cancellationToken = default)
     {
         return await _context.Alerts
-            .Where(a => a.CreatedAt < date && a.IsActive)
+            .Where(a => a.CreatedAt < date && a.IsEnable)
             .ToListAsync(cancellationToken);
     }
 

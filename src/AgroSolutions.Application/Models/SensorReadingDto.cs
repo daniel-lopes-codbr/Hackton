@@ -1,24 +1,32 @@
 namespace AgroSolutions.Application.Models;
 
 /// <summary>
-/// DTO for single sensor reading ingestion
+/// DTO for telemetry ingestion (aligned with diagram)
+/// Id, FieldId (FieldPlotId), SoilMoisture, AirTemperature, Precipitation, IsRichInPests, CreatedAt
 /// </summary>
-public class SensorReadingDto
+public partial class SensorReadingDto
 {
     public Guid Id { get; set; }
     public Guid FieldId { get; set; }
-    public string SensorType { get; set; } = string.Empty;
-    public decimal Value { get; set; }
-    public string Unit { get; set; } = string.Empty;
-    public DateTime ReadingTimestamp { get; set; }
+    public decimal? SoilMoisture { get; set; }
+    public decimal? AirTemperature { get; set; }
+    public decimal? Precipitation { get; set; }
+    public bool? IsRichInPests { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
+// Backwards-compatible legacy properties for single-sensor readings
+public partial class SensorReadingDto
+{
+    public string? SensorType { get; set; }
+    public decimal? Value { get; set; }
+    public string? Unit { get; set; }
+    public DateTime? ReadingTimestamp { get; set; }
     public string? Location { get; set; }
     public Dictionary<string, string>? Metadata { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
 }
 
 /// <summary>
-/// DTO for batch sensor readings ingestion
+/// DTO for batch telemetry ingestion
 /// </summary>
 public class BatchSensorReadingDto
 {

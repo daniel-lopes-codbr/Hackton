@@ -1,18 +1,18 @@
 namespace AgroSolutions.Application.Models;
 
 /// <summary>
-/// DTO for Field response
+/// DTO for Field (FieldPlot) response matching diagram:
+/// Id, Name, FarmId, AreaSquareMeters, CropType, CreatedAt, LastUpdatedAt
 /// </summary>
 public class FieldDto
 {
     public Guid Id { get; set; }
     public Guid FarmId { get; set; }
-    public PropertyDto Property { get; set; } = null!;
+    public string Name { get; set; } = string.Empty;
+    public decimal AreaSquareMeters { get; set; }
     public string CropType { get; set; } = string.Empty;
-    public DateTime? PlantingDate { get; set; }
-    public DateTime? HarvestDate { get; set; }
     public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime? LastUpdatedAt { get; set; }
 }
 
 /// <summary>
@@ -20,10 +20,9 @@ public class FieldDto
 /// </summary>
 public class CreateFieldDto
 {
-    public PropertyDto Property { get; set; } = null!;
+    public string Name { get; set; } = string.Empty;
+    public decimal AreaSquareMeters { get; set; }
     public string CropType { get; set; } = string.Empty;
-    public DateTime? PlantingDate { get; set; }
-    public DateTime? HarvestDate { get; set; }
 }
 
 /// <summary>
@@ -31,8 +30,7 @@ public class CreateFieldDto
 /// </summary>
 public class UpdateFieldDto
 {
-    public PropertyDto? Property { get; set; }
+    public string? Name { get; set; }
+    public decimal? AreaSquareMeters { get; set; }
     public string? CropType { get; set; }
-    public DateTime? PlantingDate { get; set; }
-    public DateTime? HarvestDate { get; set; }
 }

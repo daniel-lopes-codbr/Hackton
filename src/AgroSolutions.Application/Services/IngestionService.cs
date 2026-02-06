@@ -68,10 +68,4 @@ public class IngestionService : IIngestionService
         var readings = await _repository.GetByFieldIdAsync(fieldId, cancellationToken);
         return _mapper.Map<IEnumerable<SensorReadingDto>>(readings);
     }
-
-    public async Task<IEnumerable<SensorReadingDto>> GetByFieldIdAndSensorTypeAsync(Guid fieldId, string sensorType, CancellationToken cancellationToken = default)
-    {
-        var readings = await _repository.GetByFieldIdAndSensorTypeAsync(fieldId, sensorType, cancellationToken);
-        return _mapper.Map<IEnumerable<SensorReadingDto>>(readings);
-    }
 }

@@ -41,8 +41,8 @@ public class FarmRepository : IFarmRepository
     public async Task<IEnumerable<Farm>> GetByOwnerNameAsync(string ownerName, CancellationToken cancellationToken = default)
     {
         return await _context.Farms
-            .Where(f => f.OwnerName.Contains(ownerName))
-            .OrderBy(f => f.OwnerName)
+            .Where(f => f.Name.Contains(ownerName))
+            .OrderBy(f => f.Name)
             .ToListAsync(cancellationToken);
     }
 

@@ -9,9 +9,10 @@ namespace AgroSolutions.Application.Commands.Farms;
 /// </summary>
 public class CreateFarmCommand : IRequest<Result<FarmDto>>
 {
+    public string Name { get; set; } = string.Empty;
     public Guid? UserId { get; set; }
-    public PropertyDto Property { get; set; } = null!;
-    public string OwnerName { get; set; } = string.Empty;
-    public string? OwnerEmail { get; set; }
-    public string? OwnerPhone { get; set; }
+    public decimal WidthMeters { get; set; }
+    public decimal LengthMeters { get; set; }
+    public decimal? TotalAreaSquareMeters { get; set; }
+    public decimal? Precipitation { get; set; }
 }

@@ -186,7 +186,7 @@ public class IngestionController : ControllerBase
     {
         try
         {
-            var readings = await _ingestionService.GetByFieldIdAndSensorTypeAsync(fieldId, sensorType, cancellationToken);
+            var readings = await _ingestionService.GetByFieldIdAsync(fieldId, cancellationToken);
             return Ok(readings);
         }
         catch (Exception ex)

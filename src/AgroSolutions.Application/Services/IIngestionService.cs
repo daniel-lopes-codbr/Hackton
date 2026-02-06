@@ -32,9 +32,4 @@ public interface IIngestionService
     /// Gets all sensor readings for a specific field
     /// </summary>
     Task<IEnumerable<SensorReadingDto>> GetByFieldIdAsync(Guid fieldId, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Gets sensor readings for a field filtered by sensor type
-    /// </summary>
-    Task<IEnumerable<SensorReadingDto>> GetByFieldIdAndSensorTypeAsync(Guid fieldId, string sensorType, CancellationToken cancellationToken = default);
 }

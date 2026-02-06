@@ -53,22 +53,36 @@ public class IngestBatchCommandHandler : IRequestHandler<IngestBatchCommand, Res
 
         var readingsToAdd = new List<SensorReading>();
 
-        foreach (var dto in request.Batch.Readings)
+            foreach (var dto in request.Batch.Readings)
         {
             if (cancellationToken.IsCancellationRequested)
                 break;
 
             try
             {
-                var reading = new SensorReading(
-                    dto.FieldId,
-                    dto.SensorType,
-                    dto.Value,
-                    dto.Unit,
-                    dto.ReadingTimestamp,
-                    dto.Location,
-                    dto.Metadata
-                );
+                    SensorReading reading;
+                    if (!string.IsNullOrWhiteSpace(dto.SensorType))
+                    {
+                        reading = new SensorReading(
+                            dto.FieldId,
+                            dto.SensorType!,
+                            dto.Value ?? 0m,
+                            dto.Unit ?? string.Empty,
+                            dto.ReadingTimestamp ?? DateTime.UtcNow,
+                            dto.Location,
+                            dto.Metadata
+                        );
+                    }
+                    else
+                    {
+                        reading = new SensorReading(
+                            dto.FieldId,
+                            dto.SoilMoisture,
+                            dto.AirTemperature,
+                            dto.Precipitation,
+                            dto.IsRichInPests
+                        );
+                    }
                 readingsToAdd.Add(reading);
                 response.ProcessedCount++;
             }

@@ -37,20 +37,12 @@ public class CreateFarmCommandHandler : IRequestHandler<CreateFarmCommand, Resul
 
     public async Task<Result<Models.FarmDto>> Handle(CreateFarmCommand request, CancellationToken cancellationToken)
     {
-        // Create Value Object
-        var property = new Property(
-            request.Property.Name,
-            request.Property.Location,
-            request.Property.Area,
-            request.Property.Description
-        );
-
-        // Create Entity (UserId opcional: associa a fazenda ao usuário)
+        // Create Entity using new Farm shape
         var farm = new Farm(
-            property,
-            request.OwnerName,
-            request.OwnerEmail,
-            request.OwnerPhone,
+            request.Name,
+            request.WidthMeters,
+            request.LengthMeters,
+            request.Precipitation,
             request.UserId
         );
 
@@ -61,7 +53,7 @@ public class CreateFarmCommandHandler : IRequestHandler<CreateFarmCommand, Resul
         // Map Entity → DTO using AutoMapper
         var farmDto = _mapper.Map<Models.FarmDto>(farm);
 
-        _logger.LogInformation("Created farm {FarmId} for owner {OwnerName}", farm.Id, farm.OwnerName);
+        _logger.LogInformation("Created farm {FarmId} with name {Name}", farm.Id, farm.Name);
 
         return Result<Models.FarmDto>.Success(farmDto);
     }

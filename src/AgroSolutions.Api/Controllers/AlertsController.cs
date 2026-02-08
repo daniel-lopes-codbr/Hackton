@@ -80,12 +80,12 @@ public class AlertsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all alerts (User or Admin)
+    /// Get all alerts (Admin only)
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of all alerts</returns>
     [HttpGet]
-    [Authorize(Roles = "User,Admin")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(IEnumerable<AlertDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)

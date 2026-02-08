@@ -67,10 +67,10 @@ public class FieldsController : ControllerBase
     }
 
     /// <summary>
-    /// Create a new field for a farm (Admin only)
+    /// Create a new field for a farm (User or Admin)
     /// </summary>
     [HttpPost("farm/{farmId}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "User,Admin")]
     [ProducesResponseType(typeof(FieldDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -99,10 +99,10 @@ public class FieldsController : ControllerBase
     }
 
     /// <summary>
-    /// Update an existing field (Admin only)
+    /// Update an existing field (User or Admin)
     /// </summary>
     [HttpPut("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "User,Admin")]
     [ProducesResponseType(typeof(FieldDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -131,10 +131,10 @@ public class FieldsController : ControllerBase
     }
 
     /// <summary>
-    /// Delete a field (Admin only)
+    /// Delete a field (User or Admin)
     /// </summary>
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "User,Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

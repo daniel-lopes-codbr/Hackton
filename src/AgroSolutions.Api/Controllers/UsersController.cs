@@ -38,6 +38,7 @@ public class UsersController : ControllerBase
     /// Get user by ID (Admin only)
     /// </summary>
     [HttpGet("{id}")]
+    [Authorize(Roles = "User,Admin")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken = default)

@@ -25,10 +25,10 @@ public class FarmsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all farms (User or Admin)
+    /// Get all farms (Admin only)
     /// </summary>
     [HttpGet]
-    [Authorize(Roles = "User,Admin")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(IEnumerable<FarmDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)

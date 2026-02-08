@@ -18,18 +18,7 @@ public class AlertDto
 /// <summary>
 /// DTO for creating alerts (triggers validation process)
 /// </summary>
-public class CreateAlertsDto
-{
-    // Empty - triggers automatic alert generation from sensor readings
-}
-
-/// <summary>
-/// DTO for updating alerts (deactivate previous day alerts)
-/// </summary>
-public class UpdateAlertsDto
-{
-    // Empty - triggers deactivation of alerts from previous day
-}
+// Note: alert generation/update commands are parameterless and use command objects.
 
 /// <summary>
 /// Response DTO for alert creation process

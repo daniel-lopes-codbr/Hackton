@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AgroSolutions.Domain\AgroSolutions.Domain.csproj" />
+    <ProjectReference Include="../../src/AgroSolutions.Domain/AgroSolutions.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,3 +29,4 @@
   </ItemGroup>
 
 </Project>
+

@@ -36,3 +36,4 @@ public class SensorStatistics
     public decimal? Max { get; set; }
     public int ReadingCount { get; set; }
 }
+

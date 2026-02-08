@@ -142,3 +142,4 @@ public class DataProcessingServiceTests
         Assert.True(result.Insights.ContainsKey("recommendations"));
     }
 }
+

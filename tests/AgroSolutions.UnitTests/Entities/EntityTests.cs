@@ -99,3 +99,4 @@ internal class TestEntity : Entity
     public TestEntity() : base() { }
     public TestEntity(Guid id) : base(id) { }
 }
+

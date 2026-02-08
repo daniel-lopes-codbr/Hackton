@@ -20,11 +20,14 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Moq" Version="4.20.70" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AgroSolutions.Functions\AgroSolutions.Functions.csproj" />
+    <ProjectReference Include="..\AgroSolutions.Functions\AgroSolutions.Functions.csproj" />
     <ProjectReference Include="..\..\src\AgroSolutions.Domain\AgroSolutions.Domain.csproj" />
   </ItemGroup>
 
 </Project>
+

@@ -30,3 +30,4 @@ public class ProcessedReading
     public Dictionary<string, object>? Insights { get; set; }
     public DateTime ProcessedAt { get; set; }
 }
+

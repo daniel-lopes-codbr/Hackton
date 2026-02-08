@@ -91,41 +91,58 @@ try
     });
 
     // Configure Database
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-        ?? "Data Source=AgroSolutions.db";
-    
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? "Host=localhost;Database=agrosolutions;Username=postgres;Password=postgres";
+
     builder.Services.AddDbContext<AgroSolutionsDbContext>(options =>
     {
-        // Use SQLite for development, SQL Server for production
+        // Development: prefer PostgreSQL, fall back to InMemory or SQLite if explicitly configured
         if (builder.Environment.IsDevelopment())
         {
-            // Check if connection string is for SQLite or InMemory
+            // In-memory DB for tests/dev scenarios
             if (connectionString.Contains(":memory:"))
             {
                 options.UseInMemoryDatabase("AgroSolutionsDb");
             }
+            // Detect Postgres-style connection strings
+            else if (connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase)
+                  || connectionString.StartsWith("postgres", StringComparison.OrdinalIgnoreCase)
+                  || connectionString.Contains("Port=", StringComparison.OrdinalIgnoreCase))
+            {
+                // Use Npgsql provider for PostgreSQL
+                options.UseNpgsql(connectionString, b => b.MigrationsAssembly("AgroSolutions.Api"));
+            }
+            // Keep a fallback to SQLite if explicitly provided (backwards compatibility)
             else if (connectionString.Contains("Data Source=") || connectionString.EndsWith(".db"))
             {
-                // SQLite database file (MigrationsAssembly so "dotnet ef" creates migrations in Api project)
                 options.UseSqlite(connectionString, b => b.MigrationsAssembly("AgroSolutions.Api"));
             }
             else
             {
-                // Fallback to SQLite if connection string is not recognized
-                options.UseSqlite("Data Source=AgroSolutions.db", b => b.MigrationsAssembly("AgroSolutions.Api"));
+                // Default to PostgreSQL in development
+                options.UseNpgsql(connectionString, b => b.MigrationsAssembly("AgroSolutions.Api"));
             }
         }
         else
         {
-            // Production: Use SQL Server
-            options.UseSqlServer(connectionString, sqlOptions =>
+            // Production: prefer PostgreSQL if connection string indicates it, otherwise keep SQL Server
+            if (connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase)
+                || connectionString.StartsWith("postgres", StringComparison.OrdinalIgnoreCase)
+                || connectionString.Contains("Port=", StringComparison.OrdinalIgnoreCase))
             {
-                sqlOptions.MigrationsAssembly("AgroSolutions.Api");
-                sqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 5,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null);
-            });
+                options.UseNpgsql(connectionString, b => b.MigrationsAssembly("AgroSolutions.Api"));
+            }
+            else
+            {
+                options.UseSqlServer(connectionString, sqlOptions =>
+                {
+                    sqlOptions.MigrationsAssembly("AgroSolutions.Api");
+                    sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorNumbersToAdd: null);
+                });
+            }
         }
     });
 
@@ -294,150 +311,45 @@ try
             
             if (app.Environment.IsDevelopment())
             {
-                // For SQLite, handle file path and ensure database is created
-                string? dbPath = null;
-                if (connectionString.Contains("Data Source=") && !connectionString.Contains(":memory:"))
-                {
-                    dbPath = connectionString.Replace("Data Source=", "").Trim();
-                    // Resolve relative path to absolute path
-                    if (!Path.IsPathRooted(dbPath))
-                    {
-                        dbPath = Path.Combine(Directory.GetCurrentDirectory(), dbPath);
-                    }
-                    
-                    logger.LogInformation("SQLite database path: {DbPath}", dbPath);
-                    
-                    // If file exists but is empty or corrupted, delete it
-                    if (File.Exists(dbPath))
-                    {
-                        var fileInfo = new FileInfo(dbPath);
-                        logger.LogInformation("Database file exists. Size: {Size} bytes", fileInfo.Length);
-                        
-                        // Check if file is empty or very small (likely no tables)
-                        if (fileInfo.Length < 1000) // SQLite file with tables should be larger
-                        {
-                            logger.LogWarning("Database file is very small ({Size} bytes), may be empty. Deleting...", fileInfo.Length);
-                            File.Delete(dbPath);
-                            // Also delete WAL and SHM files if they exist
-                            var walPath = dbPath + "-wal";
-                            var shmPath = dbPath + "-shm";
-                            if (File.Exists(walPath)) File.Delete(walPath);
-                            if (File.Exists(shmPath)) File.Delete(shmPath);
-                        }
-                    }
-                }
-                
-                // Ensure database and tables are created
-                logger.LogInformation("Calling EnsureCreatedAsync()...");
-                bool databaseCreated = false;
-                int retryCount = 0;
-                const int maxRetries = 2;
-                
-                while (!databaseCreated && retryCount < maxRetries)
-                {
-                    try
-                    {
-                        var created = await context.Database.EnsureCreatedAsync();
-                        logger.LogInformation("EnsureCreatedAsync returned: {Created}", created);
-                        databaseCreated = true;
-                    }
-                    catch (Exception createEx)
-                    {
-                        retryCount++;
-                        logger.LogError(createEx, "✗ Error creating database (attempt {Retry}/{MaxRetries}): {ErrorMessage}", retryCount, maxRetries, createEx.Message);
-                        
-                        if (retryCount < maxRetries)
-                        {
-                            logger.LogInformation("Attempting to delete corrupted database and recreate...");
-                            
-                            // Delete database file and recreate
-                            try
-                            {
-                                await context.Database.EnsureDeletedAsync();
-                                // Also delete file manually if needed
-                                if (dbPath != null && File.Exists(dbPath))
-                                {
-                                    File.Delete(dbPath);
-                                    var walPath = dbPath + "-wal";
-                                    var shmPath = dbPath + "-shm";
-                                    if (File.Exists(walPath)) File.Delete(walPath);
-                                    if (File.Exists(shmPath)) File.Delete(shmPath);
-                                    logger.LogInformation("Deleted database file and related files");
-                                }
-                            }
-                            catch (Exception deleteEx)
-                            {
-                                logger.LogWarning(deleteEx, "Error deleting database file: {ErrorMessage}", deleteEx.Message);
-                            }
-                            
-                            // Wait a bit before retrying
-                            await Task.Delay(500);
-                        }
-                        else
-                        {
-                            logger.LogError("Failed to create database after {MaxRetries} attempts", maxRetries);
-                            throw; // Re-throw if all retries failed
-                        }
-                    }
-                }
-                
-                // Se o banco já existia antes de adicionar a coluna UserId (SQLite), adiciona a coluna agora
-                if (connectionString.Contains("Data Source=") && !connectionString.Contains(":memory:"))
-                {
-                    try
-                    {
-                        await context.Database.ExecuteSqlRawAsync(
-                            "ALTER TABLE Farms ADD COLUMN UserId TEXT NULL;");
-                        logger.LogInformation("✓ Coluna UserId adicionada à tabela Farms");
-                    }
-                    catch (Microsoft.Data.Sqlite.SqliteException ex) when (ex.SqliteErrorCode == 1 && ex.Message.Contains("duplicate column name"))
-                    {
-                        // Coluna já existe, ignora
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogDebug(ex, "ALTER TABLE Farms (UserId) skipped or failed");
-                    }
-                    try
-                    {
-                        await context.Database.ExecuteSqlRawAsync(
-                            "CREATE INDEX IF NOT EXISTS IX_Farms_UserId ON Farms(UserId);");
-                    }
-                    catch (Exception)
-                    {
-                        // Índice pode já existir
-                    }
-                }
-                
-                // Verify tables exist by querying
-                logger.LogInformation("Verifying database tables...");
+                logger.LogInformation("Development DB initialization. Provider: {Provider}", context.Database.ProviderName);
                 try
                 {
-                    var userCount = await context.Users.CountAsync();
-                    logger.LogInformation("✓ Users table exists with {Count} records", userCount);
-                    
-                    var farmCount = await context.Farms.CountAsync();
-                    logger.LogInformation("✓ Farms table exists with {Count} records", farmCount);
-                    
-                    var fieldCount = await context.Fields.CountAsync();
-                    logger.LogInformation("✓ Fields table exists with {Count} records", fieldCount);
-                    
-                    var alertCount = await context.Alerts.CountAsync();
-                    logger.LogInformation("✓ Alerts table exists with {Count} records", alertCount);
-                    
-                    logger.LogInformation("✓ All tables verified successfully");
+                    if (context.Database.IsRelational())
+                    {
+                        logger.LogInformation("Applying migrations...");
+                        await context.Database.MigrateAsync();
+                        logger.LogInformation("Migrations applied successfully");
+                    }
+                    else
+                    {
+                        logger.LogInformation("Ensuring non-relational DB is created...");
+                        await context.Database.EnsureCreatedAsync();
+                    }
                 }
-                catch (Exception verifyEx)
+                catch (Exception dbEx)
                 {
-                    logger.LogError(verifyEx, "✗ Tables verification failed: {ErrorMessage}", verifyEx.Message);
-                    throw; // Re-throw to be caught by outer catch
+                    logger.LogError(dbEx, "✗ Error initializing development database: {ErrorMessage}", dbEx.Message);
                 }
             }
             else
             {
-                // For production (SQL Server)
-                logger.LogInformation("Ensuring production database is ready...");
-                await context.Database.EnsureCreatedAsync();
+                // For production: apply migrations for relational providers
+                logger.LogInformation("Ensuring production database is ready. Provider: {Provider}", context.Database.ProviderName);
+                try
+                {
+                    if (context.Database.IsRelational())
+                    {
+                        await context.Database.MigrateAsync();
+                    }
+                    else
+                    {
+                        await context.Database.EnsureCreatedAsync();
+                    }
+                }
+                catch (Exception prodEx)
+                {
+                    logger.LogError(prodEx, "✗ Error initializing production database: {ErrorMessage}", prodEx.Message);
+                }
             }
 
             // Seed initial admin user if database is empty

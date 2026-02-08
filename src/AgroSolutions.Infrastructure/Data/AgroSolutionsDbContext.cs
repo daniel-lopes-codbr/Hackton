@@ -24,13 +24,18 @@ public class AgroSolutionsDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // Detect if using Postgres provider to set appropriate column types
+        var isPostgres = Database.ProviderName != null && Database.ProviderName.Contains("Npgsql", System.StringComparison.OrdinalIgnoreCase);
+
         // Configure Farm
         modelBuilder.Entity<Farm>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedNever(); // We generate GUIDs ourselves
+            if (isPostgres) entity.Property(e => e.Id).HasColumnType("uuid");
             entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
             entity.Property(e => e.UserId);
+            if (isPostgres) entity.Property(e => e.UserId).HasColumnType("uuid");
             entity.Property(e => e.WidthMeters).IsRequired().HasPrecision(18, 2);
             entity.Property(e => e.LengthMeters).IsRequired().HasPrecision(18, 2);
             entity.Property(e => e.TotalAreaSquareMeters).IsRequired().HasPrecision(18, 2);
@@ -58,7 +63,9 @@ public class AgroSolutionsDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedNever();
+            if (isPostgres) entity.Property(e => e.Id).HasColumnType("uuid");
             entity.Property(e => e.FarmId).IsRequired();
+            if (isPostgres) entity.Property(e => e.FarmId).HasColumnType("uuid");
             entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
             entity.Property(e => e.AreaSquareMeters).IsRequired().HasPrecision(18, 2);
             entity.Property(e => e.CropType).IsRequired().HasMaxLength(100);
@@ -85,7 +92,9 @@ public class AgroSolutionsDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedNever();
+            if (isPostgres) entity.Property(e => e.Id).HasColumnType("uuid");
             entity.Property(e => e.FieldId).IsRequired();
+            if (isPostgres) entity.Property(e => e.FieldId).HasColumnType("uuid");
 
             // Old fields (single sensor readings)
             entity.Property(e => e.SensorType).HasMaxLength(50);
@@ -93,11 +102,18 @@ public class AgroSolutionsDbContext : DbContext
             entity.Property(e => e.Unit).HasMaxLength(20);
             entity.Property(e => e.ReadingTimestamp);
             entity.Property(e => e.Location).HasMaxLength(200);
-            entity.Property(e => e.Metadata)
+            var metadataConversion = entity.Property(e => e.Metadata)
                 .HasConversion(
                     v => v == null ? (string?)null : ConvertDictionaryToJson(v),
-                    v => string.IsNullOrEmpty(v) ? null : ConvertJsonToDictionary(v))
-                .HasColumnType("TEXT");
+                    v => string.IsNullOrEmpty(v) ? null : ConvertJsonToDictionary(v));
+            if (isPostgres)
+            {
+                metadataConversion.HasColumnType("jsonb");
+            }
+            else
+            {
+                metadataConversion.HasColumnType("TEXT");
+            }
 
             // New aggregated telemetry fields
             entity.Property(e => e.SoilMoisture).HasPrecision(18, 4);
@@ -118,6 +134,7 @@ public class AgroSolutionsDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedNever();
+            if (isPostgres) entity.Property(e => e.Id).HasColumnType("uuid");
             entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Email).IsRequired().HasMaxLength(200);
             entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(500);
@@ -134,7 +151,9 @@ public class AgroSolutionsDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedNever();
+            if (isPostgres) entity.Property(e => e.Id).HasColumnType("uuid");
             entity.Property(e => e.FieldId).IsRequired();
+            if (isPostgres) entity.Property(e => e.FieldId).HasColumnType("uuid");
             entity.Property(e => e.Status).IsRequired().HasConversion<int>();
             entity.Property(e => e.IsEnable).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();

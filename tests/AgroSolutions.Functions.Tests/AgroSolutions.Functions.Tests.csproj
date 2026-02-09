@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AgroSolutions.Functions\AgroSolutions.Functions.csproj" />
+    <ProjectReference Include="..\..\AgroSolution.Function\AgroSolutionsFunctions\AgroSolutionsFunctions.csproj" />
     <ProjectReference Include="..\..\src\AgroSolutions.Domain\AgroSolutions.Domain.csproj" />
   </ItemGroup>
 

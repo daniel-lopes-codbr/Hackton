@@ -2,39 +2,52 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy solution and project files
-COPY ["AgroSolutions.sln", "./"]
-COPY ["src/AgroSolutions.Domain/AgroSolutions.Domain.csproj", "src/AgroSolutions.Domain/"]
+# Copy csproj and restore dependencies
 COPY ["src/AgroSolutions.Api/AgroSolutions.Api.csproj", "src/AgroSolutions.Api/"]
-COPY ["src/AgroSolutions.Functions/AgroSolutions.Functions.csproj", "src/AgroSolutions.Functions/"]
+COPY ["src/AgroSolutions.Application/AgroSolutions.Application.csproj", "src/AgroSolutions.Application/"]
+COPY ["src/AgroSolutions.Domain/AgroSolutions.Domain.csproj", "src/AgroSolutions.Domain/"]
+COPY ["src/AgroSolutions.Infrastructure/AgroSolutions.Infrastructure.csproj", "src/AgroSolutions.Infrastructure/"]
+COPY ["tests/AgroSolutions.UnitTests/AgroSolutions.UnitTests.csproj", "tests/AgroSolutions.UnitTests/"]
 
-# Restore dependencies
-RUN dotnet restore "AgroSolutions.sln"
+# Restore packages
+RUN dotnet restore "src/AgroSolutions.Api/AgroSolutions.Api.csproj"
+RUN dotnet restore "tests/AgroSolutions.UnitTests/AgroSolutions.UnitTests.csproj"
 
 # Copy all source files
 COPY . .
 
-# Build the solution
-WORKDIR "/src/src/AgroSolutions.Api"
-RUN dotnet build "AgroSolutions.Api.csproj" -c Release -o /app/build
+# Build the projects
+RUN dotnet build "src/AgroSolutions.Api/AgroSolutions.Api.csproj" -c Release
+RUN dotnet build "tests/AgroSolutions.UnitTests/AgroSolutions.UnitTests.csproj" -c Release
 
-# Publish stage
+# Test stage
+FROM build AS test
+WORKDIR /src
+RUN dotnet test "tests/AgroSolutions.UnitTests/AgroSolutions.UnitTests.csproj" -c Release --no-build
+
+# Build and publish
 FROM build AS publish
-RUN dotnet publish "AgroSolutions.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet build "src/AgroSolutions.Api/AgroSolutions.Api.csproj" -c Release -o /app/build
+RUN dotnet publish "src/AgroSolutions.Api/AgroSolutions.Api.csproj" -c Release -o /app/publish
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
-# Create logs directory
-RUN mkdir -p /app/logs
+# Set environment variables
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV ASPNETCORE_URLS=http://+:80
 
-# Copy published files
+# Copy the published app
 COPY --from=publish /app/publish .
 
-# Expose port
-EXPOSE 8080
-ENV ASPNETCORE_URLS=http://+:8080
+# Create a non-root user
+RUN adduser --disabled-password --gecos "" appuser && chown -R appuser /app
+USER appuser
 
-# Set entry point
+# Expose port 80
+EXPOSE 80
+
+# Set the entry point
 ENTRYPOINT ["dotnet", "AgroSolutions.Api.dll"]
+

@@ -1,0 +1,68 @@
+# 1. API DE GESTÃO (AgroAPI)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agro-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agro-api
+  template:
+    metadata:
+      labels:
+        app: agro-api
+    spec:
+      containers:
+      - name: agro-api
+        image: agroapi 
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          value: "Host=host.docker.internal;Port=5432;Database=db_ms_agro;Username=postgres;Password=agro123;"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agro-api-service
+spec:
+  selector:
+    app: agro-api
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+
+# 2. SERVIÇO DE INGESTÃO (Azure Function)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agro-function
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agro-function
+  template:
+    metadata:
+      labels:
+        app: agro-function
+    spec:
+      containers:
+      - name: function-container
+        image: function-agro:v2
+        imagePullPolicy: Never
+        env:
+        - name: ServiceBusConnection
+          value: "__ServiceBusConnection__"
+        - name: Login
+          value: "__Login__"  
+        - name: Password
+          value: "__Password__"
+        - name: ApiAgroUrl
+          value: "http://agro-api-service:80"
+        - name: AzureWebJobsStorage
+          value: "UseDevelopmentStorage=true"
